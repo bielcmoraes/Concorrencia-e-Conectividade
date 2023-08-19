@@ -1,16 +1,28 @@
 import socket
 from config import server_host, server_port
+import shoppingTerminal
 
+def newPurchase(client_socket):
 
-def send_receive_messages(client_socket):
+    shoppingList = {"products": [], "amout": 0.00}
     try:
         while True:
             message = input("-> ")
-            client_socket.send(message.encode())
-            data = client_socket.recv(1024).decode()
-            print('Server: ', data)
-            if message.lower().strip() == 'bye':
-                break
+            global data_recv
+
+            if message.strip() == "":
+                message = " "
+                client_socket.send(message.encode())
+                data_recv = client_socket.recv(1024).decode("utf-8")  
+            else:
+                client_socket.send(message.encode())
+                data_recv = client_socket.recv(1024).decode("utf-8")
+            
+            product = shoppingTerminal.checkProducts(data_recv) # Converte o Json para dicionário
+            shoppingTerminal.amountAndProducts(product, shoppingList) #Adiciona o produto à lista e soma o valor ao montante
+
+            if message.lower().strip() == 'checkout':
+                return shoppingList
     except Exception as e:
         print("Error:", e)
     finally:
@@ -26,7 +38,8 @@ def main():
     print("Connected to server on", host, "port", port)
 
     try:
-        send_receive_messages(client_socket)
+        checkout = newPurchase(client_socket)
+        print(checkout)
     except KeyboardInterrupt:
         print("Closing the client.")
 
