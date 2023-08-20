@@ -1,8 +1,8 @@
 import json
 import socket
-from _thread import *
 import threading
 import apiFunctions
+import queue #Usada para criar filas de threads e facilitar a troca de informações entre elas
 
 print_lock = threading.Lock()
 
@@ -13,15 +13,24 @@ def threaded(c):
             print_lock.release()
             break
         
-        data_decode = data.decode('utf-8')
+        dataDecode = data.decode('utf-8')
+        dataDict = json.loads(dataDecode)
+        
+        if type(dataDict) != int:
+            productsExists = dataDict.get("products")
+            if productsExists is not None:
+                result_queue = queue.Queue()
+                threadSendApi = threading.Thread(target=apiFunctions.post_request, args=([dataDict, result_queue],))
+                threadSendApi.start()
+                threadSendApi.join()  # Espera a thread terminar
 
-        responseApi = apiFunctions.get_request(data_decode)
-        
-        #Fazer a lógica para caso o client mande checkout finalize a compra
-        # retirando as quantidades do estoque
-        responseApiEncode = json.dumps(responseApi).encode()
-        
-        c.send(responseApiEncode)
+                responseApi = result_queue.get()  # Obtém o resultado da thread
+                c.send(str(responseApi).encode())
+
+        else:
+            responseApi = apiFunctions.get_request(dataDecode)
+            responseApiEncode = json.dumps(responseApi).encode()
+            c.send(responseApiEncode)
 
     c.close()
 
@@ -40,7 +49,7 @@ def Main():
         c, addr = s.accept()
         print_lock.acquire()
         print('Conectado a:', addr[0], ':', addr[1])
-        start_new_thread(threaded, (c,))
+        threading.Thread(target=threaded, args=(c,)).start()
 
     s.close()
 

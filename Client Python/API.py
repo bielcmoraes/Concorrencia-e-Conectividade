@@ -32,6 +32,26 @@ class MyHandler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(json.dumps({"error": "Fruta nao encontrada"}).encode())
 
+    def do_POST(self):
+        if self.path == '/checkout':
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            post_data = json.loads(post_data.decode('utf-8'))
+            
+            for product in post_data["products"]: #Desconta os produtos comprados do estoque
+                if product["id"] in dados:
+                    dados[product["id"]]["quantidade"] -= 1
+
+            self.send_response(201)
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
+            self.wfile.write(b'Compra finalizada com sucesso')
+        else:
+            self.send_response(404)
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
+            self.wfile.write('Rota não encontrada')
+
 def main():
     host = ""
     port = 8000

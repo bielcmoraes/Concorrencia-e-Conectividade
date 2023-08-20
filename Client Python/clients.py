@@ -1,3 +1,4 @@
+import json
 import socket
 from config import server_host, server_port
 import shoppingTerminal
@@ -15,14 +16,19 @@ def newPurchase(client_socket):
                 client_socket.send(message.encode())
                 data_recv = client_socket.recv(1024).decode("utf-8")  
             else:
-                client_socket.send(message.encode())
-                data_recv = client_socket.recv(1024).decode("utf-8")
-            
-            product = shoppingTerminal.checkProducts(data_recv) # Converte o Json para dicionário
-            shoppingTerminal.amountAndProducts(product, shoppingList) #Adiciona o produto à lista e soma o valor ao montante
+                if message.lower().strip() == 'checkout': #Envia a lista para debitar do estoque
+                    shoppingListJson = json.dumps(shoppingList)
+                    client_socket.sendall(shoppingListJson.encode("utf-8"))
+                    data_recv = client_socket.recv(1024).decode("utf-8")
+                    if data_recv == "201":
+                        print("Compra finalizada com sucesso!!!")
 
-            if message.lower().strip() == 'checkout':
-                return shoppingList
+                else: #Envia id do produto, recebe a resposta e adiciona na lista
+                    client_socket.send(message.encode())
+                    data_recv = client_socket.recv(1024).decode("utf-8")
+                    product = shoppingTerminal.checkProducts(data_recv) # Converte o Json para dicionário
+                    shoppingTerminal.amountAndProducts(message, product, shoppingList) #Adiciona o produto à lista e soma o valor ao montante
+
     except Exception as e:
         print("Error:", e)
     finally:

@@ -13,3 +13,9 @@ def get_request (resource):
                 print("Erro no JSON:", e)
     except Exception as e:
         print("ERROR COM REQUEST: ", e)
+
+def post_request(argsList):
+    shopping_list, result_queue = argsList
+    url = "http://localhost:8000/checkout"
+    response = requests.post(url, json=shopping_list)
+    result_queue.put(response.status_code) #Adiciona a thread a fila de threads
