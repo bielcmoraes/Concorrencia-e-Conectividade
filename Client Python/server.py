@@ -24,8 +24,7 @@ def threaded(c):
                         result_queue = queue.Queue()
                         threadSendApi = threading.Thread(target=apiFunctions.post_request, args=([dataDict, result_queue],))
                         threadSendApi.start()
-                        #threadSendApi.join()  # Espera a thread terminar
-
+                        threadSendApi.join()  # Espera a thread terminar
                         responseApi = result_queue.get()  # Obtém o resultado da thread
                         c.send(str(responseApi).encode())
 
