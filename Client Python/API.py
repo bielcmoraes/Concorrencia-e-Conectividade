@@ -42,6 +42,7 @@ class MyHandler(BaseHTTPRequestHandler):
                 if product["id"] in dados:
                     dados[product["id"]]["quantidade"] -= 1
 
+            print(dados)
             self.send_response(201)
             self.send_header('Content-type', 'text/html')
             self.end_headers()

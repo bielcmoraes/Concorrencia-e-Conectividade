@@ -1,7 +1,7 @@
 import requests
 import json
 
-def get_request (resource):
+def get_request(resource):
     try:
         url = "http://localhost:8000/" + str(resource)
         response = requests.get(url)
@@ -18,4 +18,4 @@ def post_request(argsList):
     shopping_list, result_queue = argsList
     url = "http://localhost:8000/checkout"
     response = requests.post(url, json=shopping_list)
-    result_queue.put(response.status_code) #Adiciona a thread a fila de threads
+    result_queue.put(response.status_code)

@@ -1,53 +1,77 @@
 import json
 import socket
 from config import server_host, server_port
-import shoppingTerminal
 
-def newPurchase(client_socket):
-
-    shoppingList = {"products": [], "amout": 0.00}
+def read_products(rfid_socket):
     try:
         while True:
-            message = input("-> ")
-            global data_recv
+            id = rfid_socket.recv(1024).decode()
+            if id:
+                return id
+    except:
+        pass
 
-            if message.strip() == "":
-                message = " "
-                client_socket.send(message.encode())
-                data_recv = client_socket.recv(1024).decode("utf-8")  
-            else:
-                if message.lower().strip() == 'checkout': #Envia a lista para debitar do estoque
-                    shoppingListJson = json.dumps(shoppingList)
-                    client_socket.sendall(shoppingListJson.encode("utf-8"))
-                    data_recv = client_socket.recv(1024).decode("utf-8")
-                    if data_recv == "201":
-                        print("Compra finalizada com sucesso!!!")
+def checkout(client_socket, shoppingList):
+    shoppingListJson = json.dumps(shoppingList)
+    client_socket.sendall(shoppingListJson.encode())
+    data_recv = client_socket.recv(1024).decode()
+    return data_recv
 
-                else: #Envia id do produto, recebe a resposta e adiciona na lista
-                    client_socket.send(message.encode())
-                    data_recv = client_socket.recv(1024).decode("utf-8")
-                    product = shoppingTerminal.checkProducts(data_recv) # Converte o Json para dicionário
-                    shoppingTerminal.amountAndProducts(message, product, shoppingList) #Adiciona o produto à lista e soma o valor ao montante
+def list_products(client_socket, message, shoppingList):
+    client_socket.send(message.encode())
+    data_recv = client_socket.recv(1024).decode()
 
+    try:
+        product = json.loads(data_recv)
+        product_name = product.get("nome")
+        if product_name is not None:
+            shoppingList["products"].append({"id": id, "nome": product_name})
+            shoppingList["amout"] += product.get("preco", 0.0)
+        return shoppingList
+    except json.JSONDecodeError as e:
+        pass
+    except Exception as e:
+        print("Other error:", e)
+
+def newPurchase(client_socket, id, shoppingList):
+    try:
+        message = id
+        global data_recv
+        if message.lower().strip() == 'checkout': #Envia a lista para debitar do estoque
+            checkout(client_socket, shoppingList)
+        shoppingList = list_products(client_socket, message, shoppingList)
+        return shoppingList
     except Exception as e:
         print("Error:", e)
     finally:
         client_socket.close()
 
-def main():
-    host = server_host
-    port = server_port
-
-    client_socket = socket.socket()
-    client_socket.connect((host, port))
-
+def handle_conection(host, port):
+    conection_socket = socket.socket()
+    conection_socket.connect((host, port))
     print("Connected to server on", host, "port", port)
+    return conection_socket
 
-    try:
-        checkout = newPurchase(client_socket)
-        print(checkout)
-    except KeyboardInterrupt:
-        print("Closing the client.")
+ 
+def main():
+    rfid_socket = handle_conection('127.0.0.1', 12345) #Recebe a host e a port do server RFID 
+    client_socket = handle_conection(server_host, server_port)
+
+    print("Digite [1] para iniciar uma nova compra!!!")
+    print("Digite [2] para encerrar o caixa!!!")
+    start = input("-->>")
+
+    if start == "1":
+        try:
+            shoppingList = {"products": [], "amout": 0.00}
+            while True:
+                id = read_products(rfid_socket)
+                shoppingList = newPurchase(client_socket, id, shoppingList)
+        except Exception as e:
+            print("Error: ", e)
+    
+    elif start == "2":
+        client_socket.close()
 
 
 
