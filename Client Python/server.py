@@ -36,7 +36,7 @@ def threaded(c):
         pass
 
 def Main():
-    host = "192.168.43.198"
+    host = "172.25.128.1"
     port = 3322
     
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

@@ -54,7 +54,9 @@ def handle_conection(host, port):
 
  
 def main():
-    rfid_socket = handle_conection('127.0.0.1', 12345) #Recebe a host e a port do server RFID 
+
+    
+    rfid_socket = handle_conection('172.16.103.0', 1234) #Recebe a host e a port do server RFID 
     client_socket = handle_conection(server_host, server_port)
 
     print("Digite [1] para iniciar uma nova compra!!!")
@@ -65,6 +67,7 @@ def main():
         try:
             shoppingList = {"products": [], "amout": 0.00}
             while True:
+                # id = input()
                 id = read_products(rfid_socket)
                 shoppingList = newPurchase(client_socket, id, shoppingList)
         except Exception as e:
