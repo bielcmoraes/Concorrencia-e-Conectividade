@@ -14,8 +14,17 @@ def get_request(resource):
     except Exception as e:
         print("ERROR COM REQUEST: ", e)
 
-def post_request(argsList):
-    shopping_list, result_queue = argsList
-    url = "http://localhost:8000/checkout"
-    response = requests.post(url, json=shopping_list)
-    result_queue.put(response.status_code)
+def post_request(data_post, url):
+    
+    headers = {
+    "Content-Type": "application/json"  # Define o tipo de conteúdo como JSON
+    }
+    
+    data_post = json.dumps(data_post) #Converte o dicionário pra json
+
+    response = requests.post(url, data_post, headers=headers)
+
+    if response.status_code == 201:
+        return {"response": response.text}
+    else:
+        return {"error": response.text}
