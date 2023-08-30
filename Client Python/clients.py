@@ -20,7 +20,8 @@ def checkout(client_socket, shoppingList):
 def list_products(client_socket, message, shoppingList):
     client_socket.send(message.encode())
     data_recv = client_socket.recv(1024).decode()
-
+    if data_recv == "Caixa bloqueado!!!":
+        print("Achei crl")
     try:
         product = json.loads(data_recv)
         product_name = product.get("nome")
@@ -55,8 +56,7 @@ def handle_conection(host, port):
  
 def main():
 
-    
-    rfid_socket = handle_conection('172.16.103.0', 1234) #Recebe a host e a port do server RFID 
+    # rfid_socket = handle_conection('172.16.103.0', 1234) #Recebe a host e a port do server RFID 
     client_socket = handle_conection(server_host, server_port)
 
     print("Digite [1] para iniciar uma nova compra!!!")
@@ -67,8 +67,8 @@ def main():
         try:
             shoppingList = {"products": [], "amout": 0.00}
             while True:
-                # id = input()
-                id = read_products(rfid_socket)
+                id = input()
+                # id = read_products(rfid_socket)
                 shoppingList = newPurchase(client_socket, id, shoppingList)
         except Exception as e:
             print("Error: ", e)
