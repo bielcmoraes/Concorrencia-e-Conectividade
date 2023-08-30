@@ -2,7 +2,6 @@ import json
 import socket
 import threading
 import apiFunctions
-import queue #Usada para criar filas de threads e facilitar a troca de informações entre elas
 
 def Conection(socket):
     while True:
