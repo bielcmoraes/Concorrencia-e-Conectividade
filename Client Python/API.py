@@ -60,9 +60,9 @@ class MyHandler(BaseHTTPRequestHandler):
                     dados[product["id"]]["quantidade"] -= 1
 
             self.send_response(201)
-            self.send_header('Content-type', 'text/html')
+            self.send_header('Content-type', 'application/json')
             self.end_headers()
-            self.wfile.write(b'Compra finalizada com sucesso')
+            self.wfile.write(json.dumps({"message": "Compra finalizada com sucesso"}).encode())
 
         elif self.path == '/client':
             content_length = int(self.headers['Content-Length'])
@@ -74,15 +74,15 @@ class MyHandler(BaseHTTPRequestHandler):
 
             print(clients_connected)
             self.send_response(201)
-            self.send_header('Content-type', 'text/html')
+            self.send_header('Content-type', 'application/json')
             self.end_headers()
-            self.wfile.write(b'Cliente cadastrado com sucesso')
+            self.wfile.write(json.dumps({"message": "Cliente cadastrado com sucesso"}).encode())
         
         else:
             self.send_response(404)
-            self.send_header('Content-type', 'text/html')
+            self.send_header('Content-type', 'application/json')
             self.end_headers()
-            self.wfile.write('Rota não encontrada')
+            self.wfile.write(json.dumps({"error": "Rota não encontrada"}).encode())
 
     def do_PATCH(self):
         # content_length = int(self.headers.get('Content-Length', 0))

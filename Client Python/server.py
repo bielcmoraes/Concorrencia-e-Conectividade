@@ -37,7 +37,7 @@ def threaded(client):
                     productsExists = dataDict.get("products")
                     if productsExists is not None:
                         responseApi = apiFunctions.post_request(dataDict, "http://localhost:8000/checkout");
-                        client.send(str(responseApi).encode())
+                        client.send(str(responseApi).encode()) #Concerta isso
 
                 else:
                     responseApi = apiFunctions.get_request(dataDecode)

@@ -6,9 +6,9 @@ global data_recv
 def read_products(rfid_socket):
     try:
         while True:
-            id = rfid_socket.recv(1024).decode()
-            if id:
-                return id
+            id_list = rfid_socket.recv(1024).decode()
+            if id_list:
+                return id_list
     except:
         pass
 
@@ -39,7 +39,9 @@ def handle_message(client_socket, message, shoppingList):
 def new_purchase(client_socket, message, shoppingList):
     try:
         if message.lower().strip() == 'checkout': #Envia a lista para debitar do estoque
-            checkout(client_socket, shoppingList)
+            message_return = checkout(client_socket, shoppingList)
+            return message_return
+        
         new_message = handle_message(client_socket, message, shoppingList)
         return new_message
     except Exception as e:
@@ -54,28 +56,28 @@ def handle_conection(host, port):
  
 def main():
     
-    # rfid_socket = handle_conection('172.16.103.0', 1234) #Recebe a host e a port do server RFID
     client_socket = handle_conection(socket.gethostname(), server_port)
 
-    print("Digite [1] para iniciar uma nova compra!!!")
-    print("Digite [2] para encerrar o caixa!!!")
-    start = input("-->>")
-    
-    if start == "1":
-        try:
-            shoppingList = {"products": [], "amout": 0.00}
-            
-            id = input("Digite o ID do produto ou 'voltar' para voltar ao menu anterior: ")
-            message = new_purchase(client_socket, id, shoppingList)
-            print("Print na Main", message)
-        except Exception as e:
-            print("Error: ", e)
-    
-    elif start == "2":
-        client_socket.close()
-
-
-
-if __name__ == "__main__":
     while True:
-        main()
+        print("Digite o [1] para iniciar a compra: ")
+        start = input("Digite o [2] para encerrar o caixa")
+        
+        if  start == "2":
+            client_socket.close()
+            break
+        elif start == "1":
+            rfid_socket = handle_conection('172.16.103.0', 1234) #Recebe a host e a port do server RFID
+            ids_list = read_products(rfid_socket)
+            print(ids_list)
+            shoppingList = {"products": [], "amout": 0.00}
+            try:
+                for id in ids_list:
+                    message_return = new_purchase(client_socket, id, shoppingList)
+                    print("Print na Main", message_return)
+                
+                rfid_socket.close()
+            except Exception as e:
+                print("Error: ", e)
+            
+if __name__ == "__main__":
+    main()

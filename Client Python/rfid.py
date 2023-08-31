@@ -2,7 +2,7 @@ import socket
 import sys
 from datetime import datetime
 import mercury
-import time
+import json
 
 
 def comunicacao_socket(rfid_client_socket):
@@ -35,37 +35,23 @@ def enviarId(rfid_client_socket, ultimo_tempo_leitura):
     reader.set_read_plan([1], "GEN2", read_power=param)
 
     epcs = map(lambda tag: tag, reader.read())
+    print(epcs)
+    id_list = []
     for tag in epcs:
-        encoded_id = (tag.epc).decode()
-        print(encoded_id)
-        tempo_atual = time.time()
-        if ((encoded_id not in ultimo_tempo_leitura) or (tempo_atual - ultimo_tempo_leitura[encoded_id]) > 5.0):
-            ultimo_tempo_leitura[encoded_id] = tempo_atual
+        id = (tag.epc).decode()
+        print(id)
+        # tempo_atual = time.time()
+        # if ((id not in ultimo_tempo_leitura) or (tempo_atual - ultimo_tempo_leitura[id]) > 5.0):
+        #     ultimo_tempo_leitura[id] = tempo_atual
+        id_list.append(id)
 
-            rfid_client_socket.send(encoded_id.encode())
-            confirmacao = rfid_client_socket.recv(1024).decode('utf-8')
-            print(confirmacao)
-
-# def enviarListaIdFalsa(rfid_client_socket):   
-#     contador = 0
-#     lista = []
-
-#     while True:
-#         if contador == 0:
-#             contador += 1
-#             lista = [1, 2, 3, 4, 5]
-        
-#         if(len(lista) > 0):
-#             for tag in lista:
-#                 rfid_client_socket.send(str(tag).encode())
-#                 confirmacao = rfid_client_socket.recv(1024).decode()
-#                 print(confirmacao)
-#             lista = []
-        
+    lid_list = json.dumps(id_list).encode()
+    rfid_client_socket.send(lid_list)
+    confirmacao = rfid_client_socket.recv(1024).decode('utf-8')
+    print(confirmacao)
    
 
 def main():
-
     host = '172.16.103.0' #Host do leitor RFID
     port = 1234
 
