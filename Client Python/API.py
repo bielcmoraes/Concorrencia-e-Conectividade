@@ -2,14 +2,23 @@ import json
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 dados = {
-    "1": {"nome": "Abacaxi", "preco": 10.99, "quantidade": 10},
-    "2": {"nome": "Melancia", "preco": 8.99, "quantidade": 5},
-    "3": {"nome": "Abobora", "preco": 4.99, "quantidade": 23}
+    'E20000172211010218905459': {"nome": "Farinha", "preco": 10.99, "quantidade": 10},
+    'E20000172211010118905454': {"nome": "Leite", "preco": 8.99, "quantidade": 5},
+    'E20000172211011718905474': {"nome": "Arroz", "preco": 4.99, "quantidade": 23},
+    'E2000017221101321890548C': {"nome": "Feijão", "preco": 2.49, "quantidade": 15},
+    'E20000172211009418905449': {"nome": "Macarrão", "preco": 1.99, "quantidade": 30},
+    'E20000172211012518905484': {"nome": "Óleo de Soja", "preco": 3.99, "quantidade": 12},
+    'E20000172211011118905471': {"nome": "Pneu Aro 13", "preco": 278.93, "quantidade": 8},
+    'E2000017221101241890547C': {"nome": "Cuscuz Flocão", "preco": 2.99, "quantidade": 18},
+    'E2000017221100961890544A': {"nome": "Nutella", "preco": 6.99, "quantidade": 7},
+    '1': {"nome": "Cuscuz", "preco": 1.99, "quantidade": 0},
+    '2': {"nome": "Batata", "preco": 3.99, "quantidade": 10},
+    '3': {"nome": "Arroz Integral", "preco": 5.99, "quantidade": 10},
+    '4': {"nome": "Ovo", "preco": 2.99, "quantidade": 20},
+    '5': {"nome": "Pasta de Amendoim", "preco": 6.99, "quantidade": 20}
 }
 
-clients_connected = {
-
-}
+clients_connected = {}
 
 class MyHandler(BaseHTTPRequestHandler):
     def do_GET(self):

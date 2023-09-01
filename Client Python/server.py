@@ -26,26 +26,21 @@ def Conection(socket):
             threading.Thread(target = threaded, args = (client,)).start() #Inicio uma thread para o client caso ele não esteja bloqueado
 
 def threaded(client):
-    try:
-        while True:
-            data = client.recv(1024)
-            if data:
-                dataDecode = data.decode('utf-8')
-                dataDict = json.loads(dataDecode)
-                
-                if type(dataDict) != int:
-                    productsExists = dataDict.get("products")
-                    if productsExists is not None:
-                        responseApi = apiFunctions.post_request(dataDict, "http://localhost:8000/checkout");
-                        client.send(str(responseApi).encode()) #Concerta isso
+    while True:
+        data = client.recv(1024).decode('utf-8')
 
-                else:
-                    responseApi = apiFunctions.get_request(dataDecode)
-                    responseApiEncode = json.dumps(responseApi).encode()
-                    client.send(responseApiEncode)
-        
-    except:
-        pass
+        try:
+            dataDict = json.loads(data)
+            productsExists = dataDict.get("products")
+            if productsExists is not None:
+                responseApi = apiFunctions.post_request(dataDict, "http://localhost:8000/checkout");
+                responseApiEncode = json.dumps(responseApi).encode()
+                client.send(responseApiEncode)
+
+        except json.decoder.JSONDecodeError:
+            responseApi = apiFunctions.get_request(data)
+            responseApiEncode = json.dumps(responseApi).encode()
+            client.send(responseApiEncode)
 
 def Main():
     host = socket.gethostname() #Pega o ip da máquina que será o server

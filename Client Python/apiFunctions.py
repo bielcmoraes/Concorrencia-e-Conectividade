@@ -23,8 +23,5 @@ def post_request(data_post, url):
     data_post = json.dumps(data_post) #Converte o dicionário pra json
 
     response = requests.post(url, data_post, headers=headers)
-
-    if response.status_code == 201:
-        return {"response": response.text}
-    else:
-        return {"error": response.text}
+    json_data = response.json()
+    return json_data
