@@ -4,17 +4,14 @@ import threading
 import requests
 
 def get_request(resource):
-    try:
+    
         url = "http://localhost:8000/" + str(resource)
         response = requests.get(url)
-        if response.status_code == 200:
-            try:
-                json_data = response.json()
-                return json_data
-            except json.JSONDecodeError as e:
-                print("Erro no JSON:", e)
-    except Exception as e:
-        print("ERROR COM REQUEST: ", e)
+        try:
+            json_data = response.json()
+            return json_data
+        except json.JSONDecodeError as e:
+            print("Erro no JSON:", e)
 
 def post_request(data_post, url):
     
@@ -23,10 +20,22 @@ def post_request(data_post, url):
     }
     
     data_post = json.dumps(data_post) #Converte o dicionário pra json
-
     response = requests.post(url, data_post, headers=headers)
-    json_data = response.json()
-    return json_data
+    try:
+        json_data = response.json()
+        return json_data
+    except json.JSONDecodeError as e:
+        print("Erro no JSON:", e)
+
+def patch_request(data_patch, url):
+
+    response = requests.patch(url, json=data_patch)
+    try:
+        json_data = response.json()
+        return json_data
+    except json.JSONDecodeError as e:
+        print("Erro no JSON:", e)
+    
 
 def Conection(socket):
 
@@ -78,29 +87,37 @@ def threaded(client):
                 id_exists = data_dict.get("id")
 
                 if products_exists is not None:
+                    data_dict["ip"] = client_ip 
                     responseApi = post_request(data_dict, "http://localhost:8000/checkout")
                     responseApiEncode = json.dumps(responseApi).encode("utf-8")
+                    patch_request({"shopping_cart": []}, "http://localhost:8000/" + client_ip)
                     client.sendall(responseApiEncode)
 
                 elif id_exists is not None:
                     responseApi = get_request(id_exists)
                     responseApiEncode = json.dumps(responseApi).encode("utf-8")
+                    response_api_decode = responseApiEncode.decode("utf-8")
+                    post_request(response_api_decode , "http://localhost:8000/" + client_ip)
                     client.sendall(responseApiEncode)
 
                 elif message_exists is not None and message_exists == "lock status":
                     client_permission = get_request("client/" + client_ip)
                     message_error = json.dumps(client_permission)
                     client.sendall(message_error.encode("utf-8"))
+                
+                elif message_exists is not None and message_exists == "disconnect":
+                    patch_request({"shopping_cart": []}, "http://localhost:8000/" + client_ip)
+                    print("O caixa", client_ip, "desconectou-se")
             else:
                 message_blocked = json.dumps({"error": "Caixa bloqueado"})
                 client.sendall(message_blocked.encode("utf-8"))
     except ConnectionResetError:
-        print("O caixa", client_ip, "desconectou-se")
+        patch_request({"shopping_cart": []}, "http://localhost:8000/" + client_ip)
+        print("O caixa", client_ip, "desconectou-se de maneira abrupta")
         
 
-
 def Main():
-    host = "10.182.0.2" #Pega o ip da máquina que será o server
+    host = socket.gethostname() #Pega o ip da máquina que será o server
     port = 3322
     
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

@@ -1,5 +1,6 @@
 import json
 from http.server import BaseHTTPRequestHandler, HTTPServer
+import uuid
 
 dados = {
     'E20000172211010218905459': {"nome": "Farinha", "preco": 10.99, "quantidade": 10},
@@ -19,6 +20,8 @@ dados = {
 }
 
 clients_connected = {}
+
+history_purchase = {}
 
 class MyHandler(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -59,7 +62,26 @@ class MyHandler(BaseHTTPRequestHandler):
             self.wfile.write(json.dumps({"error": "Fruta nao encontrada"}).encode())
 
     def do_POST(self):
-        if self.path == '/checkout':
+
+        partes_url = self.path.split('/')
+        ip = partes_url[1]
+
+        client_exists = clients_connected.get(ip)
+
+        if client_exists:
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            post_data = json.loads(post_data.decode('utf-8'))
+            client_exists.get("shopping_cart").append(post_data)
+            
+            self.send_response(201)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            message = "Um produto foi adicionado ao carrinho do caixa " + client_exists.get("ip")
+            print(clients_connected)
+            self.wfile.write(json.dumps({"message": message}).encode('utf-8'))
+
+        elif self.path == '/checkout':
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
             post_data = json.loads(post_data.decode('utf-8'))
@@ -67,18 +89,19 @@ class MyHandler(BaseHTTPRequestHandler):
             for product in post_data["products"]: #Desconta os produtos comprados do estoque
                 if product["id"] in dados:
                     dados[product["id"]]["quantidade"] -= 1
-                    print(dados)
 
             self.send_response(201)
             self.send_header('Content-type', 'application/json')
             self.end_headers()
+            id_purchase = uuid.uuid4() 
+            history_purchase[str(id_purchase)] = post_data
             self.wfile.write(json.dumps({"message": "Compra finalizada com sucesso"}).encode())
 
         elif self.path == '/client':
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
             post_data = json.loads(post_data.decode('utf-8'))
-            
+            post_data["shopping_cart"] = []
             ip_client = post_data.get("ip")
             clients_connected[ip_client] = post_data
 
@@ -96,31 +119,49 @@ class MyHandler(BaseHTTPRequestHandler):
 
     def do_PATCH(self):
         content_length = int(self.headers.get('Content-Length', 0))
-        data_bytes = self.rfile.read(content_length)
-        data_str = data_bytes.decode('utf-8')
+        post_data = self.rfile.read(content_length)
+        post_data = json.loads(post_data.decode('utf-8'))
 
         partes_url = self.path.split('/')
+        ip = partes_url[1]
+        shopping_cart_exists = post_data.get("shopping_cart")
 
-        if "client" in self.path:
+        if shopping_cart_exists != None:
+            info_client = clients_connected.get(ip)
+            if info_client != None:
+                info_client["shopping_cart"] = post_data
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json')
+                self.end_headers()
+                response_data = json.dumps({"message": "Carronho de compras atualizado com sucesso"}).encode('utf-8')
+                self.wfile.write(response_data)
+
+        elif "client" in self.path:
             ip_client = partes_url[2]
-            
             info_client = clients_connected.get(ip_client)
 
             if info_client != None:
                 lock_status = info_client.get("blocked")
 
                 if lock_status == True:
-                    print("GHHHHJJHHJ")
                     clients_connected[ip_client]["blocked"] = False
+                    # Responder com status OK e os dados atualizados
+                    self.send_response(200)
+                    self.send_header('Content-type', 'application/json')
+                    self.end_headers()
+                    message = "Status do caixa alterado para desbloqueado"
+                    response_data = json.dumps({"message": message}).encode('utf-8')
+                    self.wfile.write(response_data)
                 else:
                     clients_connected[ip_client]["blocked"] = True
             
-                # Responder com status OK e os dados atualizados
-                self.send_response(200)
-                self.send_header('Content-type', 'application/json')
-                self.end_headers()
-                response_data = json.dumps({"Message": "Status do caixa alterado"}).encode('utf-8')
-                self.wfile.write(response_data)
+                    # Responder com status OK e os dados atualizados
+                    self.send_response(200)
+                    self.send_header('Content-type', 'application/json')
+                    self.end_headers()
+                    message = "Status do caixa alterado para bloqueado"
+                    response_data = json.dumps({"message": message}).encode('utf-8')
+                    self.wfile.write(response_data)
             else:
                 # Responder com status não encontrado
                 self.send_response(404)

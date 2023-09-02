@@ -29,7 +29,7 @@ def handle_conection(host, port):
     return conection_socket
 
 def menu_supermercado():
-    client_socket = handle_conection("10.182.0.2", server_port)
+    client_socket = handle_conection(socket.gethostname(), server_port)
     
     while True:
         print("\nMenu do Supermercado:")
@@ -90,11 +90,14 @@ def menu_supermercado():
 
         elif escolha_menu_principal == "2":
             print("Saindo do Supermercado. Até logo!")
+            json_message = json.dumps({"message": "disconnect"})
+            client_socket.sendall(json_message.encode("utf-8"))
             client_socket.close()
             break
 
         else:
             print("Opção inválida. Por favor, escolha uma opção válida.")
-
+    
+    client_socket.close()
 if __name__ == "__main__":
     menu_supermercado()
