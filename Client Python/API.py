@@ -67,6 +67,7 @@ class MyHandler(BaseHTTPRequestHandler):
             for product in post_data["products"]: #Desconta os produtos comprados do estoque
                 if product["id"] in dados:
                     dados[product["id"]]["quantidade"] -= 1
+                    print(dados)
 
             self.send_response(201)
             self.send_header('Content-type', 'application/json')
@@ -94,29 +95,38 @@ class MyHandler(BaseHTTPRequestHandler):
             self.wfile.write(json.dumps({"error": "Rota não encontrada"}).encode())
 
     def do_PATCH(self):
-        # content_length = int(self.headers.get('Content-Length', 0))
-        # data_bytes = self.rfile.read(content_length)
-        # data_str = data_bytes.decode('utf-8')
-        # patch_data = json.loads(data_str)
+        content_length = int(self.headers.get('Content-Length', 0))
+        data_bytes = self.rfile.read(content_length)
+        data_str = data_bytes.decode('utf-8')
 
         partes_url = self.path.split('/')
 
         if "client" in self.path:
             ip_client = partes_url[2]
             
-            lock_status = clients_connected.get(ip_client).get("blocked")
+            info_client = clients_connected.get(ip_client)
 
-            if lock_status == True:
-                clients_connected[ip_client]["blocked"] = False
+            if info_client != None:
+                lock_status = info_client.get("blocked")
+
+                if lock_status == True:
+                    print("GHHHHJJHHJ")
+                    clients_connected[ip_client]["blocked"] = False
+                else:
+                    clients_connected[ip_client]["blocked"] = True
             
-            clients_connected[ip_client]["blocked"] = True
-
-        # Responder com status OK e os dados atualizados
-        self.send_response(200)
-        self.send_header('Content-type', 'application/json')
-        self.end_headers()
-        response_data = json.dumps({"Message": "Status do caixa alterado"}).encode('utf-8')
-        self.wfile.write(response_data)
+                # Responder com status OK e os dados atualizados
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json')
+                self.end_headers()
+                response_data = json.dumps({"Message": "Status do caixa alterado"}).encode('utf-8')
+                self.wfile.write(response_data)
+            else:
+                # Responder com status não encontrado
+                self.send_response(404)
+                self.send_header('Content-type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"error": "Client não encontrado"}).encode())
 
 
 def main():
