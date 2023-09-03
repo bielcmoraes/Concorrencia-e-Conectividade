@@ -1,6 +1,9 @@
 import json
 import socket
-from config import server_host, server_port
+
+socket_port = 3322
+rfid_port = 1234
+rfid_host = '172.16.103.0'
 
 def read_products(rfid_socket):
     try:
@@ -26,8 +29,10 @@ def handle_conection(host, port):
 
 def main():
 
+    socket_host = input("Digite o ip do servidor: ")
+
     try:
-        client_socket = handle_conection(socket.gethostname(), server_port)
+        client_socket = handle_conection(socket_host, socket_port)
         
         while True:
             print("\nMenu do Supermercado:")
@@ -64,7 +69,7 @@ def main():
                     elif escolha_opcoes_compra == "2":
 
                         try:
-                            rfid_socket = handle_conection('172.16.103.0', 1234)
+                            rfid_socket = handle_conection(rfid_host, rfid_port)
                             ids_list = read_products(rfid_socket)
                             try:
                                 for product_id in ids_list:

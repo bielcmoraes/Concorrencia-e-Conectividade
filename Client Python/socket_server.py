@@ -3,6 +3,8 @@ import socket
 import threading
 import requests
 
+socket_port = 3322
+
 messages_log = {}
 
 output_lock = threading.Lock()
@@ -170,11 +172,11 @@ def log_one(client_ip):
     
 def Main():
     host = socket.gethostname() #Pega o ip da máquina que será o server
-    port = 3322
+    port = socket_port
     
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind((host, port))
-    print("Porta", port, "reservada")
+    print("Server", host, "on na porta", port)
 
     s.listen()
     print("Escutando na porta reservada")
