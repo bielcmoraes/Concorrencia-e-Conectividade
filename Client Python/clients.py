@@ -18,9 +18,6 @@ def shipping_with_confirmation(client_socket, json_message):
     data_recv_decode = json.loads(data_recv)
     return data_recv_decode
 
-def new_purchase(client_socket, message, shoppingList):
-    # Lógica para processar a compra aqui
-    pass
 
 def handle_conection(host, port):
     conection_socket = socket.socket()
@@ -69,9 +66,17 @@ def menu_supermercado():
                         rfid_socket = handle_conection('172.16.103.0', 1234)
                         ids_list = read_products(rfid_socket)
                         try:
-                            for id in ids_list:
-                                product_add = new_purchase(client_socket, id, shoppingList)
-                                print("Produto adicionado:", product_add)
+                            for product_id in ids_list:
+                                product = shipping_with_confirmation(client_socket, {"id": product_id})
+                                product_not_exists = product.get("error")
+                                if product_not_exists is not None:
+                                    print(product_not_exists)
+                                else:
+                                    product_name = product.get("nome")
+                                    shoppingList["products"].append({"id": product_id, "nome": product_name})
+                                    shoppingList["amout"] += product.get("preco", 0.0)
+                                    print(product)
+                                pass
                         except Exception as e:
                             print("Error: ", e)
                         rfid_socket.close()

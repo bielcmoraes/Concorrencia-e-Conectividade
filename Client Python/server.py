@@ -3,6 +3,10 @@ import socket
 import threading
 import requests
 
+messages_log = {}
+
+output_lock = threading.Lock()
+
 def get_request(resource):
     
         url = "http://localhost:8000/" + str(resource)
@@ -36,7 +40,6 @@ def patch_request(data_patch, url):
     except json.JSONDecodeError as e:
         print("Erro no JSON:", e)
     
-
 def Conection(socket):
 
     while True:
@@ -65,14 +68,22 @@ def Conection(socket):
             message_blocked = json.dumps({"error": "Caixa bloqueado"})
             client.send(message_blocked.encode("utf-8"))
 
-
 def threaded(client):
     client_ip, client_port = client.getpeername()
+    
+    messages_log[client_ip] = [] #Cria a lista de mensagens para o client conectado
 
     try:
         while True:
             data = client.recv(1024).decode('utf-8')
 
+            
+            list_messages = messages_log.get(client_ip)
+
+            if data:
+                log_message = "Rcv from " + client_ip +": " + data
+                list_messages.append(log_message)
+            
             client_permission = get_request("client/" + client_ip)
             lock_status = client_permission.get("blocked")
 
@@ -93,6 +104,9 @@ def threaded(client):
                     patch_request({"shopping_cart": []}, "http://localhost:8000/" + client_ip)
                     client.sendall(responseApiEncode)
 
+                    log_message = "Send from " + client_ip +": " + str(responseApiEncode)
+                    list_messages.append(log_message)
+
                 elif id_exists is not None:
                     responseApi = get_request(id_exists)
                     responseApiEncode = json.dumps(responseApi).encode("utf-8")
@@ -100,21 +114,60 @@ def threaded(client):
                     post_request(response_api_decode , "http://localhost:8000/" + client_ip)
                     client.sendall(responseApiEncode)
 
+                    log_message = "Send from " + client_ip +": " + str(responseApiEncode)
+                    list_messages.append(log_message)
+
                 elif message_exists is not None and message_exists == "lock status":
                     client_permission = get_request("client/" + client_ip)
                     message_error = json.dumps(client_permission)
                     client.sendall(message_error.encode("utf-8"))
+
+                    log_message = "Send from " + client_ip +": " + str(responseApiEncode)
+                    list_messages.append(log_message)
                 
                 elif message_exists is not None and message_exists == "disconnect":
                     patch_request({"shopping_cart": []}, "http://localhost:8000/" + client_ip)
                     print("O caixa", client_ip, "desconectou-se")
+
+                    log_message = "O caixa", client_ip, "desconectou-se"
+                    list_messages.append(log_message)
             else:
                 message_blocked = json.dumps({"error": "Caixa bloqueado"})
                 client.sendall(message_blocked.encode("utf-8"))
+
+                log_message = "Send from " + client_ip +": " + str(message_blocked)
+                list_messages.append(log_message)
+
     except ConnectionResetError:
         patch_request({"shopping_cart": []}, "http://localhost:8000/" + client_ip)
         print("O caixa", client_ip, "desconectou-se de maneira abrupta")
+
+        log_message = "O caixa", client_ip, "desconectou-se de maneira abrupta"
+        list_messages.append(log_message)
         
+def block_cashier(client_ip):
+    response = patch_request({}, "http://localhost:8000/client/" + client_ip)
+    print(response)
+
+def log_all():
+    # os.system('clear') or None #limpa o terminal para facilitar a visualização
+    print("Mensagens do servidor não visualizadas")
+    for client_ip, message_list in messages_log.items():
+        with output_lock: #Bloqueia a thread
+            for message in message_list:
+                print(message)
+    messages_log[client_ip] = []
+
+def log_one(client_ip):
+    # os.system('clear') or None #limpa o terminal para facilitar a visualização
+    with output_lock:
+        if client_ip in messages_log:
+            print("Mensagens não visualizadas do client " + client_ip)
+            for message in messages_log[client_ip]:
+                print(message)
+        else:
+            print(f"O cliente com IP {client_ip} não tem mensagens.")
+    
 
 def Main():
     host = socket.gethostname() #Pega o ip da máquina que será o server
@@ -128,6 +181,38 @@ def Main():
     print("Escutando na porta reservada")
 
     threading.Thread(target=Conection, args=(s,)).start()
+    
+    while True:
+        print("----Administrar servidor----")
+        print("\n1. Bloquear um caixa")
+        print("2. Mensagens não lidas de todos os caixas")
+        print("3. Mensagens não lidas de um caixa em específico")
+        print("4. Sair")
+        
+        choice = input("Escolha uma opção: ")
+
+        if choice == "1":
+            client_ip = input("Digite o IP do caixa a ser bloqueado: ")
+            block_cashier(client_ip)
+        elif choice == "2":
+            # Crie uma thread para monitorar todas as mensagens em tempo real
+            monitor_thread = threading.Thread(target=log_all)
+            monitor_thread.daemon = True  # Define a thread como daemon para que ela seja encerrada quando o programa principal encerrar
+            monitor_thread.start()
+            monitor_thread.join() #Aguarda termino da thread de visualizar mensagens
+        elif choice == "3":
+            client_ip = input("Digite o IP do caixa a ser monitorado: ")
+            # Crie uma thread para monitorar as mensagens em tempo real
+            monitor_thread = threading.Thread(target=log_one, args = (client_ip,))
+            monitor_thread.daemon = True  # Define a thread como daemon para que ela seja encerrada quando o programa principal encerrar
+            monitor_thread.start()
+            monitor_thread.join() #Aguarda termino da thread de visualizar mensagens
+        elif choice == "4":
+            print("Encerrando o servidor...")
+            s.close()
+            break
+        else:
+            print("Opção inválida. Tente novamente.")
 
 if __name__ == '__main__':
     Main()
