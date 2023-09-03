@@ -4,7 +4,6 @@ from datetime import datetime
 import mercury
 import json
 
-
 def comunicacao_socket(rfid_client_socket):
     try:
         ultimo_tempo_leitura = {}
@@ -17,7 +16,6 @@ def comunicacao_socket(rfid_client_socket):
     finally:
         print("Comunicação fechada")
         rfid_client_socket.close()
-
 
 def enviarId(rfid_client_socket, ultimo_tempo_leitura):   
     param = 2300
@@ -50,7 +48,6 @@ def enviarId(rfid_client_socket, ultimo_tempo_leitura):
     confirmacao = rfid_client_socket.recv(1024).decode('utf-8')
     print(confirmacao)
    
-
 def main():
     host = '172.16.103.0' #Host do leitor RFID
     port = 1234

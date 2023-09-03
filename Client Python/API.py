@@ -1,6 +1,8 @@
 import json
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import uuid
+import threading
+
 
 dados = {
     'E20000172211010218905459': {"nome": "Farinha", "preco": 10.99, "quantidade": 10},
@@ -22,6 +24,8 @@ dados = {
 clients_connected = {}
 
 history_purchase = {}
+
+lock = threading.Lock() #
 
 class MyHandler(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -72,7 +76,8 @@ class MyHandler(BaseHTTPRequestHandler):
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
             post_data = json.loads(post_data.decode('utf-8'))
-            client_exists.get("shopping_cart").append(post_data)
+            with lock:
+                client_exists.get("shopping_cart").append(post_data)
             
             self.send_response(201)
             self.send_header('Content-type', 'application/json')
@@ -88,13 +93,15 @@ class MyHandler(BaseHTTPRequestHandler):
             
             for product in post_data["products"]: #Desconta os produtos comprados do estoque
                 if product["id"] in dados:
-                    dados[product["id"]]["quantidade"] -= 1
+                    with lock:
+                        dados[product["id"]]["quantidade"] -= 1
 
             self.send_response(201)
             self.send_header('Content-type', 'application/json')
             self.end_headers()
-            id_purchase = uuid.uuid4() 
-            history_purchase[str(id_purchase)] = post_data
+            id_purchase = uuid.uuid4()
+            with lock:
+                history_purchase[str(id_purchase)] = post_data
             self.wfile.write(json.dumps({"message": "Compra finalizada com sucesso"}).encode())
 
         elif self.path == '/client':
@@ -103,7 +110,8 @@ class MyHandler(BaseHTTPRequestHandler):
             post_data = json.loads(post_data.decode('utf-8'))
             post_data["shopping_cart"] = []
             ip_client = post_data.get("ip")
-            clients_connected[ip_client] = post_data
+            with lock:
+                clients_connected[ip_client] = post_data
 
             print(clients_connected)
             self.send_response(201)
@@ -144,7 +152,8 @@ class MyHandler(BaseHTTPRequestHandler):
                 lock_status = info_client.get("blocked")
 
                 if lock_status == True:
-                    clients_connected[ip_client]["blocked"] = False
+                    with lock:
+                        clients_connected[ip_client]["blocked"] = False
                     # Responder com status OK e os dados atualizados
                     self.send_response(200)
                     self.send_header('Content-type', 'application/json')
@@ -153,7 +162,8 @@ class MyHandler(BaseHTTPRequestHandler):
                     response_data = json.dumps({"message": message}).encode('utf-8')
                     self.wfile.write(response_data)
                 else:
-                    clients_connected[ip_client]["blocked"] = True
+                    with lock:
+                        clients_connected[ip_client]["blocked"] = True
             
                     # Responder com status OK e os dados atualizados
                     self.send_response(200)

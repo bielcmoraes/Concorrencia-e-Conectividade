@@ -81,7 +81,7 @@ def threaded(client):
             list_messages = messages_log.get(client_ip)
 
             if data:
-                log_message = "Rcv from " + client_ip +": " + data
+                log_message = "Rcv from " + client_ip + " " + str(client_port) + ": " + data
                 list_messages.append(log_message)
             
             client_permission = get_request("client/" + client_ip)
@@ -104,7 +104,7 @@ def threaded(client):
                     patch_request({"shopping_cart": []}, "http://localhost:8000/" + client_ip)
                     client.sendall(responseApiEncode)
 
-                    log_message = "Send from " + client_ip +": " + str(responseApiEncode)
+                    log_message = "Send from " + client_ip + " " + str(client_port) +": " + str(responseApiEncode)
                     list_messages.append(log_message)
 
                 elif id_exists is not None:
@@ -114,7 +114,7 @@ def threaded(client):
                     post_request(response_api_decode , "http://localhost:8000/" + client_ip)
                     client.sendall(responseApiEncode)
 
-                    log_message = "Send from " + client_ip +": " + str(responseApiEncode)
+                    log_message = "Send from " + client_ip + " " + str(client_port) +": " + str(responseApiEncode)
                     list_messages.append(log_message)
 
                 elif message_exists is not None and message_exists == "lock status":
@@ -122,27 +122,27 @@ def threaded(client):
                     message_error = json.dumps(client_permission)
                     client.sendall(message_error.encode("utf-8"))
 
-                    log_message = "Send from " + client_ip +": " + str(responseApiEncode)
+                    log_message = "Send from " + client_ip + " " + str(client_port) + ": " + str(responseApiEncode)
                     list_messages.append(log_message)
                 
                 elif message_exists is not None and message_exists == "disconnect":
                     patch_request({"shopping_cart": []}, "http://localhost:8000/" + client_ip)
-                    print("O caixa", client_ip, "desconectou-se")
+                    print("O caixa", client_ip, str(client_port), "desconectou-se")
 
-                    log_message = "O caixa", client_ip, "desconectou-se"
+                    log_message = "O caixa", client_ip, str(client_port), "desconectou-se"
                     list_messages.append(log_message)
             else:
                 message_blocked = json.dumps({"error": "Caixa bloqueado"})
                 client.sendall(message_blocked.encode("utf-8"))
 
-                log_message = "Send from " + client_ip +": " + str(message_blocked)
+                log_message = "Send from " + client_ip + " " + str(client_port) + ": " + str(message_blocked)
                 list_messages.append(log_message)
 
     except ConnectionResetError:
         patch_request({"shopping_cart": []}, "http://localhost:8000/" + client_ip)
-        print("O caixa", client_ip, "desconectou-se de maneira abrupta")
+        print("O caixa", client_ip, str(client_port), "desconectou-se de maneira abrupta")
 
-        log_message = "O caixa", client_ip, "desconectou-se de maneira abrupta"
+        log_message = "O caixa", client_ip, str(client_port), "desconectou-se de maneira abrupta"
         list_messages.append(log_message)
         
 def block_cashier(client_ip):
@@ -168,7 +168,6 @@ def log_one(client_ip):
         else:
             print(f"O cliente com IP {client_ip} não tem mensagens.")
     
-
 def Main():
     host = socket.gethostname() #Pega o ip da máquina que será o server
     port = 3322

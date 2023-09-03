@@ -18,91 +18,95 @@ def shipping_with_confirmation(client_socket, json_message):
     data_recv_decode = json.loads(data_recv)
     return data_recv_decode
 
-
 def handle_conection(host, port):
     conection_socket = socket.socket()
     conection_socket.connect((host, port))
     print("Conectado ao servidor em", host, "porta", port)
     return conection_socket
 
-def menu_supermercado():
-    client_socket = handle_conection(socket.gethostname(), server_port)
-    
-    while True:
-        print("\nMenu do Supermercado:")
-        print("1. Iniciar uma compra")
-        print("2. Sair")
+def main():
 
-        escolha_menu_principal = input("Digite 1 para iniciar uma compra ou 2 para sair: ")
+    try:
+        client_socket = handle_conection(socket.gethostname(), server_port)
+        
+        while True:
+            print("\nMenu do Supermercado:")
+            print("1. Iniciar uma compra")
+            print("2. Sair")
 
-        if escolha_menu_principal == "1":
-            shoppingList = {"products": [], "amout": 0.00}
+            escolha_menu_principal = input("Digite 1 para iniciar uma compra ou 2 para sair: ")
 
-            while True:
-                print("\nOpções de Compra:")
-                print("1. Digitar o ID manualmente")
-                print("2. Pegar do leitor RFID")
-                print("3. Finalizar compra e retornar ao menu anterior")
+            if escolha_menu_principal == "1":
+                shoppingList = {"products": [], "amout": 0.00}
 
-                escolha_opcoes_compra = input("Escolha uma opção de compra (1/2/3): ")
+                while True:
+                    print("\nOpções de Compra:")
+                    print("1. Digitar o ID manualmente")
+                    print("2. Pegar do leitor RFID")
+                    print("3. Finalizar compra e retornar ao menu anterior")
 
-                if escolha_opcoes_compra == "1":
-                    product_id = input("Id: ")
-                    product = shipping_with_confirmation(client_socket, {"id": product_id})
+                    escolha_opcoes_compra = input("Escolha uma opção de compra (1/2/3): ")
 
-                    product_not_exists = product.get("error")
-                    if product_not_exists is not None:
-                        print(product_not_exists)
-                    else:
-                        product_name = product.get("nome")
-                        shoppingList["products"].append({"id": product_id, "nome": product_name})
-                        shoppingList["amout"] += product.get("preco", 0.0)
-                        print(product)
-                    pass
+                    if escolha_opcoes_compra == "1":
+                        product_id = input("Id: ")
+                        product = shipping_with_confirmation(client_socket, {"id": product_id})
 
-                elif escolha_opcoes_compra == "2":
+                        product_not_exists = product.get("error")
+                        if product_not_exists is not None:
+                            print(product_not_exists)
+                        else:
+                            product_name = product.get("nome")
+                            shoppingList["products"].append({"id": product_id, "nome": product_name})
+                            shoppingList["amout"] += product.get("preco", 0.0)
+                            print(product)
+                        pass
 
-                    try:
-                        rfid_socket = handle_conection('172.16.103.0', 1234)
-                        ids_list = read_products(rfid_socket)
+                    elif escolha_opcoes_compra == "2":
+
                         try:
-                            for product_id in ids_list:
-                                product = shipping_with_confirmation(client_socket, {"id": product_id})
-                                product_not_exists = product.get("error")
-                                if product_not_exists is not None:
-                                    print(product_not_exists)
-                                else:
-                                    product_name = product.get("nome")
-                                    shoppingList["products"].append({"id": product_id, "nome": product_name})
-                                    shoppingList["amout"] += product.get("preco", 0.0)
-                                    print(product)
-                                pass
-                        except Exception as e:
-                            print("Error: ", e)
-                        rfid_socket.close()
-                        pass
-                    except TimeoutError:
-                        print("Leitor RFID indisponível")
-                        pass
+                            rfid_socket = handle_conection('172.16.103.0', 1234)
+                            ids_list = read_products(rfid_socket)
+                            try:
+                                for product_id in ids_list:
+                                    product = shipping_with_confirmation(client_socket, {"id": product_id})
+                                    product_not_exists = product.get("error")
+                                    if product_not_exists is not None:
+                                        print(product_not_exists)
+                                    else:
+                                        product_name = product.get("nome")
+                                        shoppingList["products"].append({"id": product_id, "nome": product_name})
+                                        shoppingList["amout"] += product.get("preco", 0.0)
+                                        print(product)
+                                    pass
+                            except Exception as e:
+                                print("Error: ", e)
+                            rfid_socket.close()
+                            pass
+                        except TimeoutError:
+                            print("Leitor RFID indisponível")
+                            pass
 
-                elif escolha_opcoes_compra == "3":
-                    purchase_confirmation = shipping_with_confirmation(client_socket, shoppingList)
-                    print(purchase_confirmation)
-                    break
+                    elif escolha_opcoes_compra == "3":
+                        purchase_confirmation = shipping_with_confirmation(client_socket, shoppingList)
+                        print(purchase_confirmation)
+                        break
 
-                else:
-                    print("Opção inválida. Por favor, escolha uma opção válida.")
+                    else:
+                        print("Opção inválida. Por favor, escolha uma opção válida.")
 
-        elif escolha_menu_principal == "2":
-            print("Saindo do Supermercado. Até logo!")
-            json_message = json.dumps({"message": "disconnect"})
-            client_socket.sendall(json_message.encode("utf-8"))
-            client_socket.close()
-            break
+            elif escolha_menu_principal == "2":
+                print("Saindo do Supermercado. Até logo!")
+                json_message = json.dumps({"message": "disconnect"})
+                client_socket.sendall(json_message.encode("utf-8"))
+                client_socket.close()
+                break
 
-        else:
-            print("Opção inválida. Por favor, escolha uma opção válida.")
+            else:
+                print("Opção inválida. Por favor, escolha uma opção válida.")
     
-    client_socket.close()
+    except ConnectionResetError:
+        print("Servidor temporariamente indisponível")
+        print("Tente conectar-se novamente")
+
 if __name__ == "__main__":
-    menu_supermercado()
+    main()
