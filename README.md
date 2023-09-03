@@ -47,6 +47,16 @@
   O servidor intermediário é responsável por gerenciar conexões, receber mensagens dos caixas e responder as mensagens de maneira coerente e eficaz, além de poder bloquear e desbloquer os caixas. Para isso, o servidor intermediário cria uma thread para cada conecxão gerenciada pelo mesmo, ou seja, cria uma thread para cada caixa conectado com ele. As threads recebem e respondem as mensagens do caixa conforme o solicitado e, para tal fazem requisições ao servidor HTTP responsável por armazenar todas as informações relevantes e persistentes do sistema. Os verbos HTTP implementados foram: GET, POST e PATCH e, são utilizados conforme as necessidades do servidor intermediário e dos caixas conectados.
 </p>
 
+<p style="text-align: justify;">
+  No servidor HTTP são mantidos três dicionários Python: o primeiro contendo os dados de cada produto, o segundo com as informações de IP, porta e status (bloqueado ou não) de cada caixa que se conectou ao sistema e o terceiro com o histórico das compras que foram realizadas no sistema. Para resolver o problema de concorrência relacionado ao acesso desses dicionários compartilhados foram implementados "threads lock" nas operações que alterassem o conteúdo desses recursos compartilhados, ou seja, principíos de "zona crítica" foram adotados e implementados utilizando a biblioteca "threading". Assim foi possível garantir que apenas um processo (caixa) por vez tivesse acesso ao recurso, evitando erros.
+</p>
+
+<p style="text-align: justify;">
+  As requisições HTTP através dos respectivos verbos HTTP desempenham um papel muito importante no sistema, pois fazem a comunicação do servidor intermediário com o servidor HTTP que é o encarregado de armazenar as informações persistentes. Além disso, por meio das requisições HTTP é possível testar e utilizar funcionalidades dos sistema sem utilizar o terminal. Todas as rotas válidas para a aplicação serão disponibilizadas a segui:
+</p>
+
+1. GET
+
 
 
 
