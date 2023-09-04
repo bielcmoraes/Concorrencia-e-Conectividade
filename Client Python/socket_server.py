@@ -12,6 +12,7 @@ output_lock = threading.Lock()
 def get_request(resource):
     
         url = "http://localhost:8000/" + str(resource)
+        url = url.replace('"', '')
         response = requests.get(url)
         try:
             json_data = response.json()

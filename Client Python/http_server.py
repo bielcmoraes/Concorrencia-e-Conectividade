@@ -28,42 +28,123 @@ history_purchase = {}
 lock = threading.Lock() #
 
 class MyHandler(BaseHTTPRequestHandler):
+    
     def do_GET(self):
         partes_url = self.path.split('/')
 
-        id = partes_url[1]
-        idExists = dados.get(id)
-        
-        if self.path == "/%20":
+        if partes_url[1] == "":
             self.send_response(200)
             self.send_header('Content-type', 'application/json')
             self.end_headers()
             self.wfile.write(json.dumps(dados).encode())
 
-        elif idExists != None:
+        elif partes_url[1] in dados:
             self.send_response(200)
             self.send_header('Content-type', 'application/json')
             self.end_headers()
-            self.wfile.write(json.dumps(dados[id]).encode())
-        
-        elif "client" in self.path: #Rota /client/127.192.1
-            self.send_response(200)
-            self.send_header('Content-type', 'application/json')
-            self.end_headers()
-            ip_client = partes_url[2]
-            client_exists = clients_connected.get(ip_client)
-            
-            if client_exists == None:
-                self.wfile.write(json.dumps({"error": "Cliente ainda não cadastrado"}).encode())
-            
+            self.wfile.write(json.dumps(dados[partes_url[1]]).encode())
+
+        elif partes_url[1] == "client":
+            if len(partes_url) >= 3:
+                ip_client = partes_url[2]
+                client_exists = clients_connected.get(ip_client)
+                if client_exists is not None:
+                    self.send_response(200)
+                    self.send_header('Content-type', 'application/json')
+                    self.end_headers()
+                    self.wfile.write(json.dumps(client_exists).encode())
+                else:
+                    self.send_response(404)
+                    self.send_header('Content-type', 'application/json')
+                    self.end_headers()
+                    self.wfile.write(json.dumps({"error": "Cliente não encontrado"}).encode())
             else:
-                lock_status = clients_connected.get(ip_client).get("blocked")
-                self.wfile.write(json.dumps({"blocked": lock_status}).encode())
+                self.send_response(400)
+                self.send_header('Content-type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"error": "ID do cliente ausente na rota"}).encode())
+
+        elif partes_url[1] == "history":
+            if len(partes_url) >= 4:
+                ip_client = partes_url[3]
+                history = []
+
+                for key, value in history_purchase.items():
+                    history_exists = value.get(ip_client)
+                    if history_exists is not None:
+                        history.append(history_exists)
+
+                if history:
+                    self.send_response(200)
+                    self.send_header('Content-type', 'application/json')
+                    self.end_headers()
+                    self.wfile.write(json.dumps({"history": history}).encode())
+                else:
+                    self.send_response(404)
+                    self.send_header('Content-type', 'application/json')
+                    self.end_headers()
+                    self.wfile.write(json.dumps({"error": "Cliente ainda não realizou compras"}).encode())
+            else:
+                self.send_response(400)
+                self.send_header('Content-type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"error": "ID do cliente ausente na rota"}).encode())
+
         else:
-            self.send_response(204)
+            self.send_response(404)
             self.send_header('Content-type', 'application/json')
             self.end_headers()
-            self.wfile.write(json.dumps({"error": "Fruta nao encontrada"}).encode())
+            self.wfile.write(json.dumps({"error": "Rota não encontrada"}).encode())
+  
+    # def do_GET(self):
+    #     partes_url = self.path.split('/')
+
+    #     id = partes_url[1]
+    #     idExists = dados.get(id)
+    #     if self.path == "/%20":
+    #         self.send_response(200)
+    #         self.send_header('Content-type', 'application/json')
+    #         self.end_headers()
+    #         self.wfile.write(json.dumps(dados).encode())
+
+    #     elif idExists != None:
+    #         self.send_response(200)
+    #         self.send_header('Content-type', 'application/json')
+    #         self.end_headers()
+    #         self.wfile.write(json.dumps(dados[id]).encode())
+        
+    #     elif partes_url[1] == "client": #Rota /client/127.192.1
+    #         self.send_response(200)
+    #         self.send_header('Content-type', 'application/json')
+    #         self.end_headers()
+    #         print(partes_url)
+    #         ip_client = partes_url[2]
+    #         client_exists = clients_connected.get(ip_client)
+    #         self.wfile.write(json.dumps({"error": "Cliente ainda não cadastrado"}).encode())
+            
+    #         if client_exists == None:
+    #             self.wfile.write(json.dumps({"error": "Cliente ainda não cadastrado"}).encode())
+        
+    #     elif "history" in self.path: #Rota /client/history/127.192.1
+    #         self.send_response(200)
+    #         self.send_header('Content-type', 'application/json')
+    #         self.end_headers()
+    #         ip_client = partes_url[3]
+
+    #         history = []
+    #         for key, value in history_purchase.items():
+    #             history_exists = value.get(ip_client)
+    #             if history_exists == None:
+    #                 self.wfile.write(json.dumps({"error": "Cliente ainda não realizou compras"}).encode())
+    #             else:
+    #                 history.append(history_exists)
+            
+    #         self.wfile.write(json.dumps({"history": history}).encode("utf-8"))
+    #     else:
+    #         self.send_response(204)
+    #         self.send_header('Content-type', 'application/json')
+    #         self.end_headers()
+    #         self.wfile.write(json.dumps({"error": "Fruta nao encontrada"}).encode("utf-8"))
 
     def do_POST(self):
 

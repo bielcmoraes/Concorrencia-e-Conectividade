@@ -8,9 +8,15 @@ rfid_host = '172.16.103.0'
 def read_products(rfid_socket):
     try:
         while True:
-            id_list = rfid_socket.recv(1024).decode()
-            if id_list:
+            ids_string = rfid_socket.recv(1024).decode("utf-8")
+            if ids_string:
+                string = ids_string.strip("[]")
+                substrings = string.split(", ")
+
+                # Crie uma lista a partir das substrings
+                id_list = [s.replace("'", "") for s in substrings]
                 return id_list
+            break
     except:
         pass
 
@@ -73,6 +79,7 @@ def main():
                             ids_list = read_products(rfid_socket)
                             try:
                                 for product_id in ids_list:
+                                    print(product_id)
                                     product = shipping_with_confirmation(client_socket, {"id": product_id})
                                     product_not_exists = product.get("error")
                                     if product_not_exists is not None:
@@ -81,7 +88,7 @@ def main():
                                         product_name = product.get("nome")
                                         shoppingList["products"].append({"id": product_id, "nome": product_name})
                                         shoppingList["amout"] += product.get("preco", 0.0)
-                                        print(product)
+                                        print(product_name)
                                     pass
                             except Exception as e:
                                 print("Error: ", e)
