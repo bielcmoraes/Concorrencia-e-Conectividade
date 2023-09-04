@@ -96,56 +96,6 @@ class MyHandler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(json.dumps({"error": "Rota não encontrada"}).encode())
   
-    # def do_GET(self):
-    #     partes_url = self.path.split('/')
-
-    #     id = partes_url[1]
-    #     idExists = dados.get(id)
-    #     if self.path == "/%20":
-    #         self.send_response(200)
-    #         self.send_header('Content-type', 'application/json')
-    #         self.end_headers()
-    #         self.wfile.write(json.dumps(dados).encode())
-
-    #     elif idExists != None:
-    #         self.send_response(200)
-    #         self.send_header('Content-type', 'application/json')
-    #         self.end_headers()
-    #         self.wfile.write(json.dumps(dados[id]).encode())
-        
-    #     elif partes_url[1] == "client": #Rota /client/127.192.1
-    #         self.send_response(200)
-    #         self.send_header('Content-type', 'application/json')
-    #         self.end_headers()
-    #         print(partes_url)
-    #         ip_client = partes_url[2]
-    #         client_exists = clients_connected.get(ip_client)
-    #         self.wfile.write(json.dumps({"error": "Cliente ainda não cadastrado"}).encode())
-            
-    #         if client_exists == None:
-    #             self.wfile.write(json.dumps({"error": "Cliente ainda não cadastrado"}).encode())
-        
-    #     elif "history" in self.path: #Rota /client/history/127.192.1
-    #         self.send_response(200)
-    #         self.send_header('Content-type', 'application/json')
-    #         self.end_headers()
-    #         ip_client = partes_url[3]
-
-    #         history = []
-    #         for key, value in history_purchase.items():
-    #             history_exists = value.get(ip_client)
-    #             if history_exists == None:
-    #                 self.wfile.write(json.dumps({"error": "Cliente ainda não realizou compras"}).encode())
-    #             else:
-    #                 history.append(history_exists)
-            
-    #         self.wfile.write(json.dumps({"history": history}).encode("utf-8"))
-    #     else:
-    #         self.send_response(204)
-    #         self.send_header('Content-type', 'application/json')
-    #         self.end_headers()
-    #         self.wfile.write(json.dumps({"error": "Fruta nao encontrada"}).encode("utf-8"))
-
     def do_POST(self):
 
         partes_url = self.path.split('/')
@@ -164,7 +114,7 @@ class MyHandler(BaseHTTPRequestHandler):
             self.send_header('Content-type', 'application/json')
             self.end_headers()
             message = "Um produto foi adicionado ao carrinho do caixa " + client_exists.get("ip")
-            print(clients_connected)
+            print(client_exists.get("shopping_cart"))
             self.wfile.write(json.dumps({"message": message}).encode('utf-8'))
 
         elif self.path == '/checkout':
@@ -172,10 +122,17 @@ class MyHandler(BaseHTTPRequestHandler):
             post_data = self.rfile.read(content_length)
             post_data = json.loads(post_data.decode('utf-8'))
             
+            
             for product in post_data["products"]: #Desconta os produtos comprados do estoque
-                if product["id"] in dados:
+                
+                if product["id"] in dados and dados[product["id"]]["quantidade"] >= 1:
                     with lock:
                         dados[product["id"]]["quantidade"] -= 1
+                else:
+                    index_product = post_data["products"].index(product)
+                    post_data["amout"] = post_data["amout"] - dados[product["id"]]["preco"]
+                    post_data["products"].remove(product)
+
 
             self.send_response(201)
             self.send_header('Content-type', 'application/json')
@@ -183,6 +140,7 @@ class MyHandler(BaseHTTPRequestHandler):
             id_purchase = uuid.uuid4()
             with lock:
                 history_purchase[str(id_purchase)] = post_data
+            print(history_purchase)
             self.wfile.write(json.dumps({"message": "Compra finalizada com sucesso"}).encode())
 
         elif self.path == '/client':
@@ -212,6 +170,7 @@ class MyHandler(BaseHTTPRequestHandler):
         post_data = json.loads(post_data.decode('utf-8'))
 
         partes_url = self.path.split('/')
+        print(partes_url)
         ip = partes_url[1]
         shopping_cart_exists = post_data.get("shopping_cart")
 
@@ -222,7 +181,7 @@ class MyHandler(BaseHTTPRequestHandler):
                 self.send_response(200)
                 self.send_header('Content-type', 'application/json')
                 self.end_headers()
-                response_data = json.dumps({"message": "Carronho de compras atualizado com sucesso"}).encode('utf-8')
+                response_data = json.dumps({"message": "Carrinho de compras atualizado com sucesso"}).encode('utf-8')
                 self.wfile.write(response_data)
 
         elif "client" in self.path:
@@ -254,12 +213,43 @@ class MyHandler(BaseHTTPRequestHandler):
                     response_data = json.dumps({"message": message}).encode('utf-8')
                     self.wfile.write(response_data)
             else:
-                # Responder com status não encontrado
                 self.send_response(404)
                 self.send_header('Content-type', 'application/json')
                 self.end_headers()
-                self.wfile.write(json.dumps({"error": "Client não encontrado"}).encode())
+                message = "Caixa não encontrado"
+                response_data = json.dumps({"message": message}).encode('utf-8')
+                self.wfile.write(response_data)
+            
+        elif partes_url[1] == "clear":
+            ip_client = partes_url[2]
+            info_client = clients_connected.get(ip_client)
 
+            if info_client != None:
+                with lock:
+                    info_client["shopping_cart"] = []
+                
+                # Responder com status OK e os dados atualizados
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json')
+                self.end_headers()
+                message = "Carrinho do caixa " + ip_client + " limpo com sucesso"
+                response_data = json.dumps({"message": message}).encode('utf-8')
+                self.wfile.write(response_data)
+            else:
+                # Responder com status OK e os dados atualizados
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json')
+                self.end_headers()
+                message = "Caixa não encontrado"
+                response_data = json.dumps({"message": message}).encode('utf-8')
+                self.wfile.write(response_data)
+            
+        else:
+            # Responder com status não encontrado
+            self.send_response(404)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps({"error": "Carrinho não encontrado"}).encode())
 
 def main():
     host = ""

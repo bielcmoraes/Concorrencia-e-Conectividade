@@ -3,6 +3,7 @@ import socket
 import threading
 import requests
 
+socket_host = "172.25.128.1"
 socket_port = 3322
 
 messages_log = {}
@@ -60,7 +61,7 @@ def Conection(socket):
                 "port": client_port,
                 "blocked": False
             }
-
+        
             post_request(client_info, "http://localhost:8000/client") #Cadastro de primeira conexão
             threading.Thread(target = threaded, args = (client,)).start() #Inicio uma thread para o client caso ele não esteja cadastrado
 
@@ -172,12 +173,11 @@ def log_one(client_ip):
             print(f"O cliente com IP {client_ip} não tem mensagens.")
     
 def Main():
-    host = socket.gethostname() #Pega o ip da máquina que será o server
-    port = socket_port
+    # host = socket.gethostname() #Pega o ip da máquina que será o server
     
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.bind((host, port))
-    print("Server", host, "on na porta", port)
+    s.bind((socket_host, socket_port))
+    print("Server", socket_host, "on na porta", socket_port)
 
     s.listen()
     print("Escutando na porta reservada")

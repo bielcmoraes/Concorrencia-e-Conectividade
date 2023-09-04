@@ -1,10 +1,6 @@
 import json
 import socket
 
-socket_port = 3322
-rfid_port = 1234
-rfid_host = '172.16.103.0'
-
 def read_products(rfid_socket):
     try:
         while True:
@@ -34,6 +30,9 @@ def handle_conection(host, port):
     return conection_socket
 
 def main():
+    socket_port = 3322
+    rfid_port = 1234
+    rfid_host = '172.16.103.0'
 
     socket_host = input("Digite o ip do servidor: ")
 
