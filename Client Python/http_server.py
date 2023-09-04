@@ -129,9 +129,9 @@ class MyHandler(BaseHTTPRequestHandler):
                     with lock:
                         dados[product["id"]]["quantidade"] -= 1
                 else:
-                    index_product = post_data["products"].index(product)
-                    post_data["amout"] = post_data["amout"] - dados[product["id"]]["preco"]
-                    post_data["products"].remove(product)
+                    with lock:
+                        post_data["amout"] = post_data["amout"] - dados[product["id"]]["preco"]
+                        post_data["products"].remove(product)
 
 
             self.send_response(201)
@@ -170,14 +170,15 @@ class MyHandler(BaseHTTPRequestHandler):
         post_data = json.loads(post_data.decode('utf-8'))
 
         partes_url = self.path.split('/')
-        print(partes_url)
         ip = partes_url[1]
         shopping_cart_exists = post_data.get("shopping_cart")
 
         if shopping_cart_exists != None:
             info_client = clients_connected.get(ip)
             if info_client != None:
-                info_client["shopping_cart"] = post_data
+                
+                with lock:
+                    info_client["shopping_cart"] = post_data
                 self.send_response(200)
                 self.send_header('Content-type', 'application/json')
                 self.end_headers()
