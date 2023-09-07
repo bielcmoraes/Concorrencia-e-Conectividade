@@ -46,40 +46,44 @@ def patch_request(data_patch, url):
 def Conection(socket):
 
     while True:
-        client, address = socket.accept()
-        print('Conectado a:', address)
-        client_ip, client_port = client.getpeername()
+        try:
+            client, address = socket.accept()
+            print('Conectado a:', address)
+            client_ip, client_port = client.getpeername()
 
-        client_permission = get_request("client/" + client_ip)
-        error_exists = client_permission.get("error")
-        lock_status = client_permission.get("blocked")
+            client_permission = get_request("client/" + client_ip)
+            error_exists = client_permission.get("error")
+            lock_status = client_permission.get("blocked")
 
-        if error_exists != None:
-            client_info = {
-                "ip": client_ip,
-                "port": client_port,
-                "blocked": False
-            }
+            if error_exists != None:
+                client_info = {
+                    "ip": client_ip,
+                    "port": client_port,
+                    "blocked": False
+                }
 
-            post_request(client_info, "http://localhost:8000/client") #Cadastro de primeira conexão
-            threading.Thread(target = threaded, args = (client,)).start() #Inicio uma thread para o client caso ele não esteja cadastrado
+                post_request(client_info, "http://localhost:8000/client") #Cadastro de primeira conexão
+                threading.Thread(target = threaded, args = (client,)).start() #Inicio uma thread para o client caso ele não esteja cadastrado
 
-        elif lock_status == False:
-            threading.Thread(target = threaded, args = (client,)).start() #Inicio uma thread para o client caso ele não esteja bloqueado
-        
-        elif lock_status == True:
-            message_blocked = json.dumps({"error": "Caixa bloqueado"})
-            client.send(message_blocked.encode("utf-8"))
+            elif lock_status == False:
+                threading.Thread(target = threaded, args = (client,)).start() #Inicio uma thread para o client caso ele não esteja bloqueado
+            
+            elif lock_status == True:
+                message_blocked = json.dumps({"error": "Caixa bloqueado"})
+                client.send(message_blocked.encode("utf-8"))
+        except requests.exceptions.RequestException:
+            client.close()
+            print("Conexão com " + client_ip + "cancelada. Servidor HTTP indisponível")
 
 def threaded(client):
     client_ip, client_port = client.getpeername()
     
     messages_log[client_ip] = [] #Cria a lista de mensagens para o client conectado
+    list_messages = None
 
     try:
         while True:
             data = client.recv(1024).decode('utf-8')
-
             
             list_messages = messages_log.get(client_ip)
 
@@ -142,6 +146,7 @@ def threaded(client):
                 list_messages.append(log_message)
 
     except ConnectionResetError:
+        list_messages = messages_log.get(client_ip)
         patch_request({"shopping_cart": []}, "http://localhost:8000/" + client_ip)
         print("O caixa", client_ip, str(client_port), "desconectou-se de maneira abrupta")
 

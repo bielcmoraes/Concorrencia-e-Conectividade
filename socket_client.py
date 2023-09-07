@@ -9,26 +9,38 @@ def read_products(rfid_socket):
             if ids_string:
                 string = ids_string.strip("[]")
                 substrings = string.split(", ")
-
-                # Crie uma lista a partir das substrings
                 id_list = [s.replace("'", "") for s in substrings]
                 return id_list
             break
+    except ConnectionAbortedError:
+        print("Caixa desconectado")
+        print("Tente conectar-se novamente")
+        exit()
     except:
         pass
 
 def shipping_with_confirmation(client_socket, json_message):
-    json_message = json.dumps(json_message)
-    client_socket.sendall(json_message.encode("utf-8"))
-    data_recv = client_socket.recv(1024).decode()
-    data_recv_decode = json.loads(data_recv)
-    return data_recv_decode
+    try:
+        json_message = json.dumps(json_message)
+        client_socket.sendall(json_message.encode("utf-8"))
+        data_recv = client_socket.recv(1024).decode()
+        data_recv_decode = json.loads(data_recv)
+        return data_recv_decode
+    except ConnectionAbortedError:
+        print("Caixa desconectado")
+        print("Tente conectar-se novamente")
+        exit()
 
 def handle_conection(host, port):
-    conection_socket = socket.socket()
-    conection_socket.connect((host, port))
-    print("Conectado ao servidor em", host, "porta", port)
-    return conection_socket
+    try:
+        conection_socket = socket.socket()
+        conection_socket.connect((host, port))
+        print("Conectado ao servidor em", host, "porta", port)
+        return conection_socket
+    except:
+        print("Erro na conexão")
+        print("Reinicie e tente novamente")
+        exit()
 
 def main():
     socket_port = int(os.environ.get('PORT_SOCKET_SERVER', 3322))
@@ -106,11 +118,16 @@ def main():
                         print("Opção inválida. Por favor, escolha uma opção válida.")
 
             elif escolha_menu_principal == "2":
-                print("Saindo do Supermercado. Até logo!")
-                json_message = json.dumps({"message": "disconnect"})
-                client_socket.sendall(json_message.encode("utf-8"))
-                client_socket.close()
-                break
+                try:
+                    print("Saindo do Supermercado. Até logo!")
+                    json_message = json.dumps({"message": "disconnect"})
+                    client_socket.sendall(json_message.encode("utf-8"))
+                    client_socket.close()
+                    break
+                except ConnectionAbortedError:
+                    print("Caixa desconectado")
+                    print("Tente conectar-se novamente")
+                    exit()
 
             else:
                 print("Opção inválida. Por favor, escolha uma opção válida.")
@@ -118,6 +135,12 @@ def main():
     except ConnectionResetError:
         print("Servidor temporariamente indisponível")
         print("Tente conectar-se novamente")
+        exit()
+    
+    except ConnectionAbortedError:
+        print("Servidor temporariamente indisponível")
+        print("Tente conectar-se novamente")
+        exit()
 
 if __name__ == "__main__":
     main()
