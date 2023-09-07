@@ -2,11 +2,12 @@ import json
 import socket
 import threading
 import requests
+import os
 
-socket_port = 3322
+socket_host = os.environ.get('HOST_SOCKET_SERVER', '127.0.0.1')
+socket_port = int(os.environ.get('PORT_SOCKET_SERVER', 3322))
 
 messages_log = {}
-
 output_lock = threading.Lock()
 
 def get_request(resource):
@@ -171,7 +172,7 @@ def log_one(client_ip):
             print(f"O cliente com IP {client_ip} não tem mensagens.")
     
 def Main():
-    host = "172.17.160.1" #Pega o ip da máquina que será o server
+    host = socket_host #Pega o ip da máquina que será o server
     port = socket_port
     
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

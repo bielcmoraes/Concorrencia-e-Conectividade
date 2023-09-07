@@ -1,5 +1,6 @@
 import json
 import socket
+import os
 
 def read_products(rfid_socket):
     try:
@@ -30,10 +31,9 @@ def handle_conection(host, port):
     return conection_socket
 
 def main():
-    socket_port = 3322
-    rfid_port = 1234
-    rfid_host = '172.16.103.0'
-
+    socket_port = int(os.environ.get('PORT_SOCKET_SERVER', 3322))
+    rfid_port = int(os.environ.get('PORT_RFID', 1234))
+    rfid_host = os.environ.get('HOST_RFID', '172.16.103.0')
     socket_host = input("Digite o ip do servidor: ")
 
     try:
