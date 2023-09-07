@@ -57,35 +57,39 @@
 
 <p style="text-align: justify;">
   <ol>
-  <li>
-    <h3>GET:</h3>
-    <ul>
-      <li> "/" - Lista todos os produtos existentes.</li>
-      <li> "/:idProduto" - Consulta um produto específico.</li>
-      <li> "/client/:idClient" - Consulta um cliente (caixa) específico.</li>
-      <li> "/history/client/:idClient" - Consulta o histórico de compras de um cliente (caixa) específico.</li>
-    </ul>
-  </li>
-  <li>
-    <h3>POST:</h3>
-    <ul>
-      <li> "/:idCliente" - Adiciona um produto ao carrinho de um cliente (caixa) específico.</li>
-      <li> "/checkout" - Finaliza uma compra e cadastra a compra no histórico de compras.</li>
-      <li> "/client/:idClient" - Cadastra um client (caixa) no sistema.</li>
-    </ul>
-  </li>
-  <li>
-    <h3>PATCH:</h3>
-    <ul>
-      <li> "/:idCliente" - Atualiza o carrinho de compras de um cliente (caixa) específico.</li>
-      <li> "client/:idCliente" - Atualiza o status de um cliente (caixa) específico.</li>
-      <li> "clear/:idCliente" - Limpa um carrinho de compras de um cliente (caixa) específico.</li>
-    </ul>
-  </li>
-</ol>
-
+    <li>
+      <h3>GET:</h3>
+      <ul>
+        <li> "/" - Lista todos os produtos existentes.</li>
+        <li> "/:idProduto" - Consulta um produto específico.</li>
+        <li> "/client/:idClient" - Consulta um cliente (caixa) específico.</li>
+        <li> "/history/client/:idClient" - Consulta o histórico de compras de um cliente (caixa) específico.</li>
+      </ul>
+    </li>
+    <li>
+      <h3>POST:</h3>
+      <ul>
+        <li> "/:idCliente" - Adiciona um produto ao carrinho de um cliente (caixa) específico.</li>
+        <li> "/checkout" - Finaliza uma compra e cadastra a compra no histórico de compras.</li>
+        <li> "/client/:idClient" - Cadastra um client (caixa) no sistema.</li>
+      </ul>
+    </li>
+    <li>
+      <h3>PATCH:</h3>
+      <ul>
+        <li> "/:idCliente" - Atualiza o carrinho de compras de um cliente (caixa) específico.</li>
+        <li> "client/:idCliente" - Atualiza o status de um cliente (caixa) específico.</li>
+        <li> "clear/:idCliente" - Limpa um carrinho de compras de um cliente (caixa) específico.</li>
+      </ul>
+    </li>
+  </ol>
 </p>
 
+<p style="text-align: justify;">
+  Todas as rotas criadas desempenham um papel fundamental para o funcionamento do sistema, porém nem todas interagem diretamente com o servidor socket, ou seja, nem todas são chamadas explicitamente por esse componente do sistema.
+  Por exemplo, a rota "clear/:idCliente" só deve ser chamada em caso de erro no servidor socket durante uma compra, especificamente, quando o servidor socket "cair" e o carrinho contenha produtos de uma compra não finalizada.
+  Dessa forma, a rota servirá para limpar o carrinho após a correção do erro, evitando que os produtos da compra que não foi finalizada entrem na próxima compra.
+</p>
 
 
 
