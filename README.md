@@ -124,3 +124,9 @@
   Disponibilizar as funcionalidades via requisições HTTP elimina a necessidade de uma interface exclusiva para para gerenciamento do sistema e possibilita aos administrador acessar informações e detalhes sobre cada caixa como o IP e o status (bloqueado ou desbloqueado), o histórico de compras de cada caixa e o estoque de produtos do sistema, podendo visualizar o estoque de todos os produtos ou de um produto específico por meio de seu código.
   Para além, é possível bloquear e desbloquear os caixas a qualquer momento e limpar um carrinho da compra em andamento.
 </p>
+
+<p style="text-align: justify;">
+  Entretanto, no terminal do administrador do sistema, adicionalmente, foi desenvolvida uma interface que possibilita ao gerente do sistema bloquear um caixa através do seu endereço IP, visualizar todas as mensagens trocados pelo servidor com todos os caixas, visualizar as mensagens trocadas com um caixa específico, além de encerrar o srvidor socket, conforme a imagem abaixo: 
+</p>
+
+![Menu de compra do caixa.](https://github.com/bielcmoraes/Concorrencia-e-Conectividade/blob/main/images_README/menu_server_socket.png)
