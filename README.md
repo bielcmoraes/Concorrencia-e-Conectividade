@@ -103,3 +103,7 @@
 <p style="text-align: justify;">
   Ao escolher iniciar uma compra é possível acessar o menu de compras onde o usuário deve escolher entre digitar o código de um produto manualmente, ler os produtos utilizandos as TAGS RFID atraves do sensor ou finalizar a compra e retornar ao menu anterior, conforme a imagem:
 </p>
+
+![Menu de compra do caixa.](https://github.com/bielcmoraes/Concorrencia-e-Conectividade/blob/main/images_README/menu_compra_client.png)
+
+
