@@ -1,8 +1,21 @@
+<div align="center">
+  <h1>
+      Relatório do problema 1: Supermercado inteligente
+  </h1>
 
-<h1 align="center">MI de Concorrencia e Conectividade</h1>
-<h2 align="center">Problema 1</h2>
-<h3 align="center">Aluno: Gabriel Cordeiro Moraes</h3>
-<h3 align="center">Matrícula: 20111201</h3>
+  <h3>
+    Gabriel Cordeiro Moraes
+  </h3>
+
+  <p>
+    Engenharia de Computação – Universidade Estadual de Feira de Santana (UEFS)
+    Av. Transnordestina, s/n, Novo Horizonte
+    Feira de Santana – BA, Brasil – 44036-900
+  </p>
+
+  <center>gcmorais66@gmail.com</center>
+
+</div>
 
 # 1. Introdução
 
@@ -95,11 +108,19 @@
 
 <p style="text-align: justify;">
   Para o devido funcionamento do sistema pelo usuário final, é necessário executar de maneira sequencial os componentes principais do sistema: "http_server", "socket_server", sensor RFID ("rfid_reader") e caixas ("socket_client").
-  No caixa é necessário digitar via terminal o endereço IP no qual o socket_server foi inicializado, após inserir o endereço do servidor é possível acessar uma interface que possibilita ao usuário iniciar uma compra ou sair do sistema, conforme a imagem abaixo:
+  O fluxo operacional destinado ao cliente inclui: digitar via terminal o endereço IP no qual o socket_server foi inicializado, após inserir o endereço do servidor é possível acessar uma interface que possibilita ao usuário iniciar uma compra ou sair do sistema, conforme a imagem abaixo:
 </p>
 
 ![Menu inicial do caixa.](https://github.com/bielcmoraes/Concorrencia-e-Conectividade/blob/main/images_README/menu_inical_client.png)
 
 <p style="text-align: justify;">
   Ao escolher iniciar uma compra é possível acessar o menu de compras onde o usuário deve escolher entre digitar o código de um produto manualmente, ler os produtos utilizandos as TAGS RFID atraves do sensor ou finalizar a compra e retornar ao menu anterior, conforme a imagem:
+</p>
+
+![Menu de compra do caixa.](https://github.com/bielcmoraes/Concorrencia-e-Conectividade/blob/main/images_README/menu_compra_client.png)
+
+<p style="text-align: justify;">
+  Para o administrador/gerente do sistema as funcionalidades estão disponíveis utilizando requisições HTTP que podem ser feitas utilizando softwares como Postman e Insomnia.
+  Disponibilizar as funcionalidades via requisições HTTP elimina a necessidade de uma interface exclusiva para para gerenciamento do sistema e possibilita aos administrador acessar informações e detalhes sobre cada caixa como o IP e o status (bloqueado ou desbloqueado), o histórico de compras de cada caixa e o estoque de produtos do sistema, podendo visualizar o estoque de todos os produtos ou de um produto específico por meio de seu código.
+  Para além, é possível bloquear e desbloquear os caixas a qualquer momento e limpar um carrinho da compra em andamento.
 </p>
