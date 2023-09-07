@@ -69,7 +69,9 @@
   <li>
     <h3>POST:</h3>
     <ul>
-      <li>Rota POST: `/api/criar` - Cria um novo recurso.</li>
+      <li>`/:idCliente` - Adiciona um produto ao carrinho de um cliente (caixa) específico.</li>
+      <li>`/checkout` - Finaliza uma compra e cadastra a compra no histórico de compras.</li>
+      <li>`/client/:idClient` - Cadastra um client (caixa) no sistema.</li>
     </ul>
   </li>
   <li>
