@@ -126,7 +126,13 @@
 </p>
 
 <p style="text-align: justify;">
-  Entretanto, no terminal do administrador do sistema, adicionalmente, foi desenvolvida uma interface que possibilita ao gerente do sistema bloquear um caixa através do seu endereço IP, visualizar todas as mensagens trocados pelo servidor com todos os caixas, visualizar as mensagens trocadas com um caixa específico, além de encerrar o srvidor socket, conforme a imagem abaixo: 
+  Entretanto, no terminal do administrador do sistema, adicionalmente, foi desenvolvida uma interface que possibilita ao gerente do sistema bloquear um caixa através do seu endereço IP, visualizar todas as mensagens trocados pelo servidor com todos os caixas, visualizar as mensagens trocadas com um caixa específico, além de encerrar o servidor socket, conforme a imagem abaixo: 
 </p>
 
 ![Menu de compra do caixa.](https://github.com/bielcmoraes/Concorrencia-e-Conectividade/blob/main/images_README/menu_server_socket.png)
+
+<p style="text-align: justify;">
+  É importante salientar que o sistema oferece o controle automático de estoque dos produtos comprados não permitindo a compra de produtos que não estejam em estoque ou estajam esgotados.
+  Além disso, erros e inconsistências são tratados de maneira adequada, oferecendo feedback aos usuários nas diferentes camadas do sistemas (caixas e administrador).
+  Toda a comunicação entre as partes do sistema é feita utilizando JavaScript Object Notation (JSON) o que possibilita a escalabilidade do sistema e a facilita a comunicação com outras interfaces e outros sistemas caso necessário. 
+</p>
