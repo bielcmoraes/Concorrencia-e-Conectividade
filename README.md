@@ -155,3 +155,23 @@
 </p>
 
 # Referências
+
+<p style="text-align: justify;">
+  Introdução a Sockets em Python. Disponível em: https://medium.com/@urapython.community/introdu%C3%A7%C3%A3o-a-sockets-em-python-44d3d55c60d0. Acesso em: 22 de agosto de 2023.
+</p>
+
+<p style="text-align: justify;">
+  threading — Thread-based parallelism.  Python Software Foundation. 2023. Disponível em: https://docs.python.org/3/library/threading.html. Acesso em: 22 de agosto de 2023.
+</p>
+
+<p style="text-align: justify;">
+  ANDRADE, Thiago. Programação Concorrente Utilizando Múltiplas Threads em Python. Revelo Community. 2023. Disponível em: https://community.revelo.com.br/programacao-concorrente-utilizando-multiplas-threads-em-python/. Acesso em: 22 de agosto de 2023.
+</p>
+
+<p style="text-align: justify;">
+  http.server — HTTP servers.  Python Software Foundation. 2023. Disponível em: https://docs.python.org/3/library/http.server.html. Acesso em: 23 de agosto de 2023.
+</p>
+
+<p style="text-align: justify;">
+  Guia de início rápido.  Kenneth Reitz. 2013. Disponível em: https://requests.readthedocs.io/projects/pt/pt_BR/latest/user/quickstart.html. Acesso em: 23 de agosto de 2023.
+</p>
