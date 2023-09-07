@@ -133,7 +133,6 @@ class MyHandler(BaseHTTPRequestHandler):
                         post_data["amout"] = post_data["amout"] - dados[product["id"]]["preco"]
                         post_data["products"].remove(product)
 
-
             self.send_response(201)
             self.send_header('Content-type', 'application/json')
             self.end_headers()
