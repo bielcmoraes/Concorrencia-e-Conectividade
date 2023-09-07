@@ -53,7 +53,7 @@
 ![Arquitetura do sistema.](https://github.com/bielcmoraes/Concorrencia-e-Conectividade/blob/main/images_README/arquitetura_do_sistema.png)
 
 <p style="text-align: justify;">
-  É possivel visualizar através da imagem que o sistema inicia o processo de comunicação quando um um sensor RFID identifica uma ou mais tags RFID e envia essa(s) tags via socket para o caixa que está conectado ao leitor RFID. O caixa por sua vez, além de está conectado ao sensor RFID também está conectado a um servidor intermediário por meio de socket.
+  É possivel visualizar através da imagem que o sistema inicia o processo de comunicação quando um um sensor RFID identifica uma ou mais TAGs RFID e envia essa(s) TAGs via socket para o caixa que está conectado ao leitor RFID. O caixa por sua vez, além de está conectado ao sensor RFID também está conectado a um servidor intermediário por meio de socket.
 </p>
 
 <p style="text-align: justify;">
@@ -114,7 +114,7 @@
 ![Menu inicial do caixa.](https://github.com/bielcmoraes/Concorrencia-e-Conectividade/blob/main/images_README/menu_inical_client.png)
 
 <p style="text-align: justify;">
-  Ao escolher iniciar uma compra é possível acessar o menu de compras onde o usuário deve escolher entre digitar o código de um produto manualmente, ler os produtos utilizandos as TAGS RFID atraves do sensor ou finalizar a compra e retornar ao menu anterior, conforme a imagem:
+  Ao escolher iniciar uma compra é possível acessar o menu de compras onde o usuário deve escolher entre digitar o código de um produto manualmente, ler os produtos utilizandos as TAGs RFID atraves do sensor ou finalizar a compra e retornar ao menu anterior, conforme a imagem:
 </p>
 
 ![Menu de compra do caixa.](https://github.com/bielcmoraes/Concorrencia-e-Conectividade/blob/main/images_README/menu_compra_client.png)
@@ -136,4 +136,20 @@
   Além disso, erros e inconsistências são tratados de maneira adequada, oferecendo feedback aos usuários nas diferentes camadas do sistemas (caixas e administrador).
   Toda a comunicação entre as partes do sistema é feita utilizando JavaScript Object Notation (JSON) o que possibilita a escalabilidade do sistema e a facilita a comunicação com outras interfaces e outros sistemas caso necessário.
   Oferecendo segurança, robustez e interfaces amigáveis e escaláveis, o sistema permite aos clientes (usuários dos caixas) realizarem compras com facilidade ao mesmo tempo que oferece várias ferramentas para os gerentes do sistema admistrarem as operações dos vários caixas de maneira eficientes. 
+</p>
+
+# 4. Conclusão
+
+<p style="text-align: justify;">
+  Com a finalização do projeto foi possível identificar e explorar os conceitos básicos envolvidos na comunicação entre computadores em uma rede local por meio da tecnologia de comunicação via socket.
+  Ao trabalhar com a tecnologia de RFID utilizando a Raspberry Pi ficaram claros o poder e a importância dos mini-computadores, além de aumentar a compreensão sobre tecnologias e soluções emergentes para problemas relacionados a Internet das Coisas (IoT) e rede de computadores.
+  Para além, foram ampliados conhecimentos sobre tecnologias bastante importantes para o cenário atual e futuro da computação, a exemplo do Docker que além de facilita o controle do comportamento de aplicações em diferentes sistemas operacionais, visto que, tem a capacidade de empacotar todas as dependências do aplicativo desenvolvido em um único contêiner.
+</p>
+
+<p style="text-align: justify;">
+  Todos os os requisitos do sistema foram cumpridos: por parte dos clientes (usuários do caixa) é possível realizar compras utilizando o sensor e as TAGs RFID. Por parte dos administradores/gerentes do sistema é possivel bloquear caixas, acompanhar compras em tempo real, consultar o historico de compras e visualizar informações detalhadas de cada caixa.
+</p>
+
+<p style="text-align: justify;">
+  As possíveis melhorias que podem ser implementadas no sistema perpassam por duas das camadas implementadas no sistema: na camada do cliente é sugerível implementar um sensor RFID exclusivo para cada caixa, aumentando o fluxo de compras e melhorando a experiência dos usuários. Já na camada do servidor socket é interessante avaliar cuidadosamente a abordagem adotada para o servidos, pois a implementação atual cria uma thread para cada caixa conectado ao sistema e a quantidade de caixas conectados e o desempenho do servidor passa a depender da capacidade de hardware do mesmo, entretanto avaliou-se a possibilidade de implementar um buffer de solicitações para os caixas, que a depender do hardware poderia fazer o servidor perder desempenho mas garantiria que todas as solicitações seriam atendidas, além de fornecer um controle melhor da quantidade de threas que estariam gerenciando as solicitações dos caixas.
 </p>
