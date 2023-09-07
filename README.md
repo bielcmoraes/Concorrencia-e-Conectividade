@@ -134,5 +134,6 @@
 <p style="text-align: justify;">
   É importante salientar que o sistema oferece o controle automático de estoque dos produtos comprados não permitindo a compra de produtos que não estejam em estoque ou estajam esgotados.
   Além disso, erros e inconsistências são tratados de maneira adequada, oferecendo feedback aos usuários nas diferentes camadas do sistemas (caixas e administrador).
-  Toda a comunicação entre as partes do sistema é feita utilizando JavaScript Object Notation (JSON) o que possibilita a escalabilidade do sistema e a facilita a comunicação com outras interfaces e outros sistemas caso necessário. 
+  Toda a comunicação entre as partes do sistema é feita utilizando JavaScript Object Notation (JSON) o que possibilita a escalabilidade do sistema e a facilita a comunicação com outras interfaces e outros sistemas caso necessário.
+  Oferecendo segurança, robustez e interfaces amigáveis e escaláveis, o sistema permite aos clientes (usuários dos caixas) realizarem compras com facilidade ao mesmo tempo que oferece várias ferramentas para os gerentes do sistema admistrarem as operações dos vários caixas de maneira eficientes. 
 </p>
