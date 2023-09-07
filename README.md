@@ -77,7 +77,13 @@
   <li>
     <h3>PATCH:</h3>
     <ul>
-      <li>Rota PATCH: `/api/atualizar` - Atualiza um recurso existente.</li>
+      <li>`/:idCliente` - Atualiza o carrinho de compras de um cliente (caixa) específico.</li>
+    </ul>
+    <ul>
+      <li>`client/:idCliente` - Atualiza o status de um cliente (caixa) específico.</li>
+    </ul>
+    <ul>
+      <li>`clear/:idCliente` - Limpa um carrinho de compras de um cliente (caixa) específico.</li>
     </ul>
   </li>
 </ol>
