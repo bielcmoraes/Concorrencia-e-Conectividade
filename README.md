@@ -60,8 +60,10 @@
   <li>
     <h3>GET:</h3>
     <ul>
-      <li>Rota GET: `/api/listar` - Lista todos os recursos existentes.</li>
-      <li>Rota GET: `/api/consultar` - Consulta um recurso específico.</li>
+      <li>`/` - Lista todos os produtos existentes.</li>
+      <li>`/:idProduto` - Consulta um produto específico.</li>
+      <li>`/client/:idClient` - Consulta um cliente (caixa) específico.</li>
+      <li>`/history/client/:idClient` - Consulta o histórico de compras de um cliente (caixa) específico.</li>
     </ul>
   </li>
   <li>
