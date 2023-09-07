@@ -52,10 +52,35 @@
 </p>
 
 <p style="text-align: justify;">
-  As requisições HTTP através dos respectivos verbos HTTP desempenham um papel muito importante no sistema, pois fazem a comunicação do servidor intermediário com o servidor HTTP que é o encarregado de armazenar as informações persistentes. Além disso, por meio das requisições HTTP é possível testar e utilizar funcionalidades dos sistema sem utilizar o terminal. Todas as rotas válidas para a aplicação serão disponibilizadas a segui:
+  As requisições HTTP através dos respectivos verbos HTTP desempenham um papel muito importante no sistema, pois fazem a comunicação do servidor intermediário com o servidor HTTP que é o encarregado de armazenar as informações persistentes. Além disso, por meio das requisições HTTP é possível testar e utilizar funcionalidades dos sistema sem utilizar o terminal. Todas as rotas válidas para a aplicação serão disponibilizadas a seguir:
 </p>
 
-1. GET
+<p style="text-align: justify;">
+  <ol>
+  <li>
+    <h3>GET:</h3>
+    <ul>
+      <li>Rota GET: `/api/listar` - Lista todos os recursos existentes.</li>
+      <li>Rota GET: `/api/consultar` - Consulta um recurso específico.</li>
+    </ul>
+  </li>
+  <li>
+    <h3>POST:</h3>
+    <ul>
+      <li>Rota POST: `/api/criar` - Cria um novo recurso.</li>
+    </ul>
+  </li>
+  <li>
+    <h3>PATCH:</h3>
+    <ul>
+      <li>Rota PATCH: `/api/atualizar` - Atualiza um recurso existente.</li>
+    </ul>
+  </li>
+</ol>
+
+</p>
+
+
 
 
 
