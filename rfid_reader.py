@@ -37,10 +37,6 @@ def enviarId(rfid_client_socket, ultimo_tempo_leitura):
     id_list = []
     for tag in epcs:
         id = (tag.epc).decode()
-        print(id)
-        # tempo_atual = time.time()
-        # if ((id not in ultimo_tempo_leitura) or (tempo_atual - ultimo_tempo_leitura[id]) > 5.0):
-        #     ultimo_tempo_leitura[id] = tempo_atual
         id_list.append(id)
 
     lid_list = json.dumps(id_list).encode()
