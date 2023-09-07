@@ -91,7 +91,9 @@
   Dessa forma, a rota servirá para limpar o carrinho após a correção do erro, evitando que os produtos da compra que não foi finalizada entrem na próxima compra.
 </p>
 
+# 3. Resultados
 
-
-
-
+<p style="text-align: justify;">
+  Para o devido funcionamento do sistema pelo usuário final, é necessário executar de maneira sequencial os componentes principais do sistema: "http_server", "socket_server", sensor RFID ("rfid_reader") e caixas ("socket_client").
+  No caixa é necessário digitar via terminal o endereço IP no qual o socket_server foi inicializado, após inserir o endereço do servidor é possível acessar uma interface que possibilita ao usuário iniciar uma compra ou sair do sistema.
+</p>
