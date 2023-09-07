@@ -153,3 +153,5 @@
 <p style="text-align: justify;">
   As possíveis melhorias que podem ser implementadas no sistema perpassam por duas das camadas implementadas no sistema: na camada do cliente é sugerível implementar um sensor RFID exclusivo para cada caixa, aumentando o fluxo de compras e melhorando a experiência dos usuários. Já na camada do servidor socket é interessante avaliar cuidadosamente a abordagem adotada para o servidos, pois a implementação atual cria uma thread para cada caixa conectado ao sistema e a quantidade de caixas conectados e o desempenho do servidor passa a depender da capacidade de hardware do mesmo, entretanto avaliou-se a possibilidade de implementar um buffer de solicitações para os caixas, que a depender do hardware poderia fazer o servidor perder desempenho mas garantiria que todas as solicitações seriam atendidas, além de fornecer um controle melhor da quantidade de threas que estariam gerenciando as solicitações dos caixas.
 </p>
+
+# Referências
