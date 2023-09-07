@@ -13,7 +13,7 @@ def read_products(rfid_socket):
                 return id_list
             break
     except ConnectionAbortedError:
-        print("Caixa desconectado")
+        print("RFID desconectado")
         print("Tente conectar-se novamente")
         exit()
     except:
