@@ -60,30 +60,26 @@
   <li>
     <h3>GET:</h3>
     <ul>
-      <li>`/` - Lista todos os produtos existentes.</li>
-      <li>`/:idProduto` - Consulta um produto específico.</li>
-      <li>`/client/:idClient` - Consulta um cliente (caixa) específico.</li>
-      <li>`/history/client/:idClient` - Consulta o histórico de compras de um cliente (caixa) específico.</li>
+      <li> "/" - Lista todos os produtos existentes.</li>
+      <li> "/:idProduto" - Consulta um produto específico.</li>
+      <li> "/client/:idClient" - Consulta um cliente (caixa) específico.</li>
+      <li> "/history/client/:idClient" - Consulta o histórico de compras de um cliente (caixa) específico.</li>
     </ul>
   </li>
   <li>
     <h3>POST:</h3>
     <ul>
-      <li>`/:idCliente` - Adiciona um produto ao carrinho de um cliente (caixa) específico.</li>
-      <li>`/checkout` - Finaliza uma compra e cadastra a compra no histórico de compras.</li>
-      <li>`/client/:idClient` - Cadastra um client (caixa) no sistema.</li>
+      <li> "/:idCliente" - Adiciona um produto ao carrinho de um cliente (caixa) específico.</li>
+      <li> "/checkout" - Finaliza uma compra e cadastra a compra no histórico de compras.</li>
+      <li> "/client/:idClient" - Cadastra um client (caixa) no sistema.</li>
     </ul>
   </li>
   <li>
     <h3>PATCH:</h3>
     <ul>
-      <li>`/:idCliente` - Atualiza o carrinho de compras de um cliente (caixa) específico.</li>
-    </ul>
-    <ul>
-      <li>`client/:idCliente` - Atualiza o status de um cliente (caixa) específico.</li>
-    </ul>
-    <ul>
-      <li>`clear/:idCliente` - Limpa um carrinho de compras de um cliente (caixa) específico.</li>
+      <li> "/:idCliente" - Atualiza o carrinho de compras de um cliente (caixa) específico.</li>
+      <li> "client/:idCliente" - Atualiza o status de um cliente (caixa) específico.</li>
+      <li> "clear/:idCliente" - Limpa um carrinho de compras de um cliente (caixa) específico.</li>
     </ul>
   </li>
 </ol>
