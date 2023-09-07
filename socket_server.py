@@ -18,7 +18,7 @@ def get_request(resource):
             json_data = response.json()
             return json_data
         except json.JSONDecodeError as e:
-            print("Erro no JSON:", e)
+            print("\nErro no JSON:", e)
 
 def post_request(data_post, url):
     
@@ -32,7 +32,7 @@ def post_request(data_post, url):
         json_data = response.json()
         return json_data
     except json.JSONDecodeError as e:
-        print("Erro no JSON:", e)
+        print("\nErro no JSON:", e)
 
 def patch_request(data_patch, url):
 
@@ -41,14 +41,14 @@ def patch_request(data_patch, url):
         json_data = response.json()
         return json_data
     except json.JSONDecodeError as e:
-        print("Erro no JSON:", e)
+        print("\nErro no JSON:", e)
     
 def Conection(socket):
 
     while True:
         try:
             client, address = socket.accept()
-            print('Conectado a:', address)
+            print('Caixa:', address, "conectou-se")
             client_ip, client_port = client.getpeername()
 
             client_permission = get_request("client/" + client_ip)
@@ -73,7 +73,7 @@ def Conection(socket):
                 client.send(message_blocked.encode("utf-8"))
         except requests.exceptions.RequestException:
             client.close()
-            print("Conexão com " + client_ip + "cancelada. Servidor HTTP indisponível")
+            print("\nConexão com " + client_ip + "cancelada. Servidor HTTP indisponível")
 
 def threaded(client):
     client_ip, client_port = client.getpeername()
@@ -134,7 +134,7 @@ def threaded(client):
                 
                 elif message_exists is not None and message_exists == "disconnect":
                     patch_request({"shopping_cart": []}, "http://localhost:8000/" + client_ip)
-                    print("O caixa", client_ip, str(client_port), "desconectou-se")
+                    print("\nO caixa", client_ip, str(client_port), "desconectou-se")
 
                     log_message = "O caixa", client_ip, str(client_port), "desconectou-se"
                     list_messages.append(log_message)
@@ -148,18 +148,17 @@ def threaded(client):
     except ConnectionResetError:
         list_messages = messages_log.get(client_ip)
         patch_request({"shopping_cart": []}, "http://localhost:8000/" + client_ip)
-        print("O caixa", client_ip, str(client_port), "desconectou-se de maneira abrupta")
+        print("\nO caixa", client_ip, str(client_port), "desconectou-se de maneira abrupta")
 
         log_message = "O caixa", client_ip, str(client_port), "desconectou-se de maneira abrupta"
         list_messages.append(log_message)
         
 def block_cashier(client_ip):
     response = patch_request({}, "http://localhost:8000/client/" + client_ip)
-    print(response)
+    print("\n" + response)
 
 def log_all():
-    # os.system('clear') or None #limpa o terminal para facilitar a visualização
-    print("Mensagens do servidor não visualizadas")
+    print("\nMensagens do servidor não visualizadas")
     for client_ip, message_list in messages_log.items():
         with output_lock: #Bloqueia a thread
             for message in message_list:
@@ -167,17 +166,17 @@ def log_all():
     messages_log[client_ip] = []
 
 def log_one(client_ip):
-    # os.system('clear') or None #limpa o terminal para facilitar a visualização
+    
     with output_lock:
         if client_ip in messages_log:
-            print("Mensagens não visualizadas do client " + client_ip)
+            print("\nMensagens não visualizadas do client " + client_ip)
             for message in messages_log[client_ip]:
                 print(message)
         else:
-            print(f"O cliente com IP {client_ip} não tem mensagens.")
+            print(f"\nO cliente com IP {client_ip} não tem mensagens.")
     
 def Main():
-    host = socket_host #Pega o ip da máquina que será o server
+    host = socket_host
     port = socket_port
     
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -190,16 +189,16 @@ def Main():
     threading.Thread(target=Conection, args=(s,)).start()
     
     while True:
-        print("----Administrar servidor----")
+        print("\n----Administrar servidor----")
         print("\n1. Bloquear um caixa")
         print("2. Mensagens não lidas de todos os caixas")
         print("3. Mensagens não lidas de um caixa em específico")
         print("4. Sair")
         
-        choice = input("Escolha uma opção: ")
+        choice = input("\nEscolha uma opção: ")
 
         if choice == "1":
-            client_ip = input("Digite o IP do caixa a ser bloqueado: ")
+            client_ip = input("\nDigite o IP do caixa a ser bloqueado: ")
             block_cashier(client_ip)
         elif choice == "2":
             # Crie uma thread para monitorar todas as mensagens em tempo real
@@ -208,18 +207,18 @@ def Main():
             monitor_thread.start()
             monitor_thread.join() #Aguarda termino da thread de visualizar mensagens
         elif choice == "3":
-            client_ip = input("Digite o IP do caixa a ser monitorado: ")
+            client_ip = input("\nDigite o IP do caixa a ser monitorado: ")
             # Crie uma thread para monitorar as mensagens em tempo real
             monitor_thread = threading.Thread(target=log_one, args = (client_ip,))
             monitor_thread.daemon = True  # Define a thread como daemon para que ela seja encerrada quando o programa principal encerrar
             monitor_thread.start()
             monitor_thread.join() #Aguarda termino da thread de visualizar mensagens
         elif choice == "4":
-            print("Encerrando o servidor...")
+            print("\nEncerrando o servidor...")
             s.close()
             break
         else:
-            print("Opção inválida. Tente novamente.")
+            print("\nOpção inválida. Tente novamente.")
 
 if __name__ == '__main__':
     Main()

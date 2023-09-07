@@ -13,9 +13,8 @@ def read_products(rfid_socket):
                 return id_list
             break
     except ConnectionAbortedError:
-        print("RFID desconectado")
-        print("Tente conectar-se novamente")
-        exit()
+        print("\nRFID desconectado")
+        print("Tente novamente")
     except:
         pass
 
@@ -27,20 +26,16 @@ def shipping_with_confirmation(client_socket, json_message):
         data_recv_decode = json.loads(data_recv)
         return data_recv_decode
     except ConnectionAbortedError:
-        print("Caixa desconectado")
+        print("\nCaixa desconectado")
         print("Tente conectar-se novamente")
         exit()
 
 def handle_conection(host, port):
-    try:
-        conection_socket = socket.socket()
-        conection_socket.connect((host, port))
-        print("Conectado ao servidor em", host, "porta", port)
-        return conection_socket
-    except:
-        print("Erro na conexão")
-        print("Reinicie e tente novamente")
-        exit()
+
+    conection_socket = socket.socket()
+    conection_socket.connect((host, port))
+    print("Conectado ao servidor em", host, "porta", port)
+    return conection_socket
 
 def main():
     socket_port = int(os.environ.get('PORT_SOCKET_SERVER', 3322))
@@ -49,8 +44,13 @@ def main():
     socket_host = input("Digite o ip do servidor: ")
 
     try:
-        client_socket = handle_conection(socket_host, socket_port)
-        
+        try:
+            client_socket = handle_conection(socket_host, socket_port)
+        except:
+            print("\nErro na conexão")
+            print("Reinicie e tente novamente")
+            exit()
+
         while True:
             print("\nMenu do Supermercado:")
             print("1. Iniciar uma compra")
@@ -106,7 +106,7 @@ def main():
                             rfid_socket.close()
                             pass
                         except TimeoutError:
-                            print("Leitor RFID indisponível")
+                            print("\nLeitor RFID indisponível")
                             pass
 
                     elif escolha_opcoes_compra == "3":
@@ -115,30 +115,30 @@ def main():
                         break
 
                     else:
-                        print("Opção inválida. Por favor, escolha uma opção válida.")
+                        print("\nOpção inválida. Por favor, escolha uma opção válida.")
 
             elif escolha_menu_principal == "2":
                 try:
-                    print("Saindo do Supermercado. Até logo!")
+                    print("\nFechando caixa. Até logo!")
                     json_message = json.dumps({"message": "disconnect"})
                     client_socket.sendall(json_message.encode("utf-8"))
                     client_socket.close()
                     break
                 except ConnectionAbortedError:
-                    print("Caixa desconectado")
+                    print("\nCaixa desconectado")
                     print("Tente conectar-se novamente")
                     exit()
 
             else:
-                print("Opção inválida. Por favor, escolha uma opção válida.")
+                print("\nOpção inválida. Por favor, escolha uma opção válida.")
     
     except ConnectionResetError:
-        print("Servidor temporariamente indisponível")
+        print("\nServidor temporariamente indisponível")
         print("Tente conectar-se novamente")
         exit()
     
     except ConnectionAbortedError:
-        print("Servidor temporariamente indisponível")
+        print("\nServidor temporariamente indisponível")
         print("Tente conectar-se novamente")
         exit()
 
