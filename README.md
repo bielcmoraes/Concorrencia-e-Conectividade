@@ -1,8 +1,21 @@
+<div align="center">
+  <h1>
+      Relatório do problema 1: Supermercado inteligente
+  </h1>
 
-<h1 align="center">MI de Concorrencia e Conectividade</h1>
-<h2 align="center">Problema 1</h2>
-<h3 align="center">Aluno: Gabriel Cordeiro Moraes</h3>
-<h3 align="center">Matrícula: 20111201</h3>
+  <h3>
+    Gabriel Cordeiro Moraes
+  </h3>
+
+  <p>
+    Engenharia de Computação – Universidade Estadual de Feira de Santana (UEFS)
+    Av. Transnordestina, s/n, Novo Horizonte
+    Feira de Santana – BA, Brasil – 44036-900
+  </p>
+
+  <center>gcmorais66@gmail.com</center>
+
+</div>
 
 # 1. Introdução
 
