@@ -17,7 +17,7 @@ def comunicacao_socket(rfid_client_socket):
         print("Comunicação fechada")
         rfid_client_socket.close()
 
-def enviarId(rfid_client_socket, ultimo_tempo_leitura):   
+def enviarId(rfid_client_socket):   
     param = 2300
 
     if len(sys.argv) > 1:
@@ -37,16 +37,10 @@ def enviarId(rfid_client_socket, ultimo_tempo_leitura):
     id_list = []
     for tag in epcs:
         id = (tag.epc).decode()
-        print(id)
-        # tempo_atual = time.time()
-        # if ((id not in ultimo_tempo_leitura) or (tempo_atual - ultimo_tempo_leitura[id]) > 5.0):
-        #     ultimo_tempo_leitura[id] = tempo_atual
         id_list.append(id)
 
     lid_list = json.dumps(id_list).encode()
     rfid_client_socket.send(lid_list)
-    confirmacao = rfid_client_socket.recv(1024).decode('utf-8')
-    print(confirmacao)
    
 def main():
     host = '172.16.103.0' #Host do leitor RFID
@@ -60,7 +54,7 @@ def main():
         rfid_client_socket.bind((host, port))
         
         # Escuta por conexões entrantes, permitindo até 5 conexões pendentes
-        rfid_client_socket.listen(1)
+        rfid_client_socket.listen(5)
         
         print(f"Leitor RFID ouvindo via socket em {host}:{port}")
 

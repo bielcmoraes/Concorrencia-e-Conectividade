@@ -2,7 +2,7 @@ import json
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import uuid
 import threading
-
+import os
 
 dados = {
     'E20000172211010218905459': {"nome": "Farinha", "preco": 10.99, "quantidade": 10},
@@ -133,7 +133,6 @@ class MyHandler(BaseHTTPRequestHandler):
                         post_data["amout"] = post_data["amout"] - dados[product["id"]]["preco"]
                         post_data["products"].remove(product)
 
-
             self.send_response(201)
             self.send_header('Content-type', 'application/json')
             self.end_headers()
@@ -253,8 +252,8 @@ class MyHandler(BaseHTTPRequestHandler):
             self.wfile.write(json.dumps({"error": "Carrinho não encontrado"}).encode())
 
 def main():
-    host = ""
-    port = 8000
+    host = os.environ.get('HOST_HTTP_SERVER', '0.0.0.0')
+    port = int(os.environ.get('PORT_HTTP_SERVER', 8000))
     
     server_address = (host, port)
     httpd = HTTPServer(server_address, MyHandler)
