@@ -62,6 +62,9 @@ def Conection(socket):
                     "port": client_port,
                     "blocked": False
                 }
+            
+                post_request(client_info, "http://" + http_host + ":8000/client") #Cadastro de primeira conexão
+                threading.Thread(target = threaded, args = (client,)).start() #Inicio uma thread para o client caso ele não esteja cadastrado
 
                 post_request(client_info, "http://" + http_host + ":8000/client") #Cadastro de primeira conexão
                 threading.Thread(target = threaded, args = (client,)).start() #Inicio uma thread para o client caso ele não esteja cadastrado
