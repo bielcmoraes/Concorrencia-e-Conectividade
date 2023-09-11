@@ -3,7 +3,7 @@ import socket
 import threading
 import requests
 
-socket_host = "172.25.128.1"
+socket_host = "172.16.103.231"
 socket_port = 3322
 
 messages_log = {}
@@ -12,7 +12,7 @@ output_lock = threading.Lock()
 
 def get_request(resource):
     
-        url = "http://localhost:8000/" + str(resource)
+        url = "http://" + socket_host + ":8000/" + str(resource)
         url = url.replace('"', '')
         response = requests.get(url)
         try:
@@ -62,7 +62,7 @@ def Conection(socket):
                 "blocked": False
             }
         
-            post_request(client_info, "http://localhost:8000/client") #Cadastro de primeira conexão
+            post_request(client_info, "http://" + socket_host + ":8000/client") #Cadastro de primeira conexão
             threading.Thread(target = threaded, args = (client,)).start() #Inicio uma thread para o client caso ele não esteja cadastrado
 
         elif lock_status == False:
@@ -103,9 +103,9 @@ def threaded(client):
 
                 if products_exists is not None:
                     data_dict["ip"] = client_ip 
-                    responseApi = post_request(data_dict, "http://localhost:8000/checkout")
+                    responseApi = post_request(data_dict, "http://" + socket_host + ":8000/checkout")
                     responseApiEncode = json.dumps(responseApi).encode("utf-8")
-                    patch_request({"shopping_cart": []}, "http://localhost:8000/" + client_ip)
+                    patch_request({"shopping_cart": []}, "http://" + socket_host + ":8000/" + client_ip)
                     client.sendall(responseApiEncode)
 
                     log_message = "Send from " + client_ip + " " + str(client_port) +": " + str(responseApiEncode)
@@ -115,7 +115,7 @@ def threaded(client):
                     responseApi = get_request(id_exists)
                     responseApiEncode = json.dumps(responseApi).encode("utf-8")
                     response_api_decode = responseApiEncode.decode("utf-8")
-                    post_request(response_api_decode , "http://localhost:8000/" + client_ip)
+                    post_request(response_api_decode , "http://" + socket_host + ":8000/" + client_ip)
                     client.sendall(responseApiEncode)
 
                     log_message = "Send from " + client_ip + " " + str(client_port) +": " + str(responseApiEncode)
@@ -130,7 +130,7 @@ def threaded(client):
                     list_messages.append(log_message)
                 
                 elif message_exists is not None and message_exists == "disconnect":
-                    patch_request({"shopping_cart": []}, "http://localhost:8000/" + client_ip)
+                    patch_request({"shopping_cart": []}, "http://" + socket_host + ":8000/" + client_ip)
                     print("O caixa", client_ip, str(client_port), "desconectou-se")
 
                     log_message = "O caixa", client_ip, str(client_port), "desconectou-se"
@@ -143,14 +143,14 @@ def threaded(client):
                 list_messages.append(log_message)
 
     except ConnectionResetError:
-        patch_request({"shopping_cart": []}, "http://localhost:8000/" + client_ip)
+        patch_request({"shopping_cart": []}, "http://" + socket_host + ":8000/" + client_ip)
         print("O caixa", client_ip, str(client_port), "desconectou-se de maneira abrupta")
 
         log_message = "O caixa", client_ip, str(client_port), "desconectou-se de maneira abrupta"
         list_messages.append(log_message)
         
 def block_cashier(client_ip):
-    response = patch_request({}, "http://localhost:8000/client/" + client_ip)
+    response = patch_request({}, "http://" + socket_host + ":8000/client/" + client_ip)
     print(response)
 
 def log_all():
